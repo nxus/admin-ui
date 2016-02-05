@@ -1,0 +1,41 @@
+{
+  "name": "@nxus/admin-ui",
+  "version": "2.2.0",
+  "description": "An Admin UI Framework for Nxus Apps",
+  "main": "lib",
+  "scripts": {
+    "test": "NODE_ENV=test mocha --compilers js:babel/register -R spec",
+    "compile": "babel --optional runtime -d lib/ src/",
+    "prepublish": "npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nxus/admin-ui.git"
+  },
+  "keywords": [
+    "nxus",
+    "admin",
+    "admin-ui"
+  ],
+  "author": "mjreich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nxus/admin-ui/issues"
+  },
+  "homepage": "https://github.com/nxus/admin-ui#readme",
+  "peerDependencies": {
+    "@nxus/core": "^2.2.0",
+    "@nxus/renderer": "^2.2.0",
+    "@nxus/templater": "^2.0.0"
+  },
+  "devDependencies": {
+    "babel": "^5.6.23",
+    "mocha": "^2.2.5",
+    "should": "^7.0.2"
+  },
+  "dependencies": {
+    "babel-runtime": "^5.7.0",
+    "bluebird": "^3.2.1",
+    "underscore": "^1.7.0"
+  }
+}
