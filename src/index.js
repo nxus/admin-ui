@@ -8,6 +8,7 @@
 
 import Promise from 'bluebird'
 import fs from 'fs'
+import _ from 'underscore'
 
 import adminBase from './adminBase'
 
@@ -39,11 +40,6 @@ export default class AdminUI {
   _setupRoutes() {
     this.users.provide('protectedRoute', this.opts.basePath)
     this.users.provide('protectedRoute', this.opts.basePath+'/*')
-
-    this.router.provide('route', 'GET', this.opts.basePath, (req, res) => {
-      let content = "Welcome to the Nxus admin page";
-      this.app.get('templater').request('render', this.opts.adminTemplate, {nav: this.nav, content, opts: this.app.config}).then(res.send.bind(res));
-    })
 
     this.router.provide('middleware', 'use', this.opts.basePath+"/*", (req, res, next) => {
       req.adminOpts = this.opts;
@@ -83,18 +79,26 @@ export default class AdminUI {
     if(!this.pages[route] || !this.pages[route].handler) return
     let handler = this.pages[route].handler
     let title = this.pages[route].title
+    let nav = this._getNav();
     
     if(typeof handler == 'string') {
       if(fs.existsSync(handler)) {
-        return this.templater.request("renderPartial", handler, this.opts.adminTemplate, {title, nav: this.nav, opts: this.app.config}).then(res.send.bind(res));
+        return this.templater.request("renderPartial", handler, this.opts.adminTemplate, {title, nav, opts: this.app.config}).then(res.send.bind(res));
       }
-      return this.templater.request("render", this.opts.adminTemplate, {title, nav: this.nav, content: handler, opts: this.app.config}).then(res.send.bind(res));
+      return this.templater.request("render", this.opts.adminTemplate, {title, nav, content: handler, opts: this.app.config}).then(res.send.bind(res));
     } else {
       return Promise.resolve(handler(req, res)).then((content) => {
-        if(content) this.templater.request("render", this.opts.adminTemplate, {title, nav: this.nav, content, opts: this.app.config}).then(res.send.bind(res));
+        if(content) this.templater.request("render", this.opts.adminTemplate, {title, nav, content, opts: this.app.config}).then(res.send.bind(res));
       }).catch((e) => {
         this.app.log('Caught error rendering admin handler', e)
       })
     }
+  }
+
+  _getNav() {
+    return _.sortBy(this.nav, (n) => {
+      if(n.opts && n.opts.order) return n.opts.order
+      return 10000000;
+    })
   }
 }
