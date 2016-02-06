@@ -41,7 +41,7 @@ export default class AdminUI {
     this.users.provide('protectedRoute', this.opts.basePath+'/*')
 
     this.router.provide('route', 'GET', this.opts.basePath, (req, res) => {
-      let content = "Hello Admin";
+      let content = "Welcome to the Nxus admin page";
       this.app.get('templater').request('render', this.opts.adminTemplate, {nav: this.nav, content, opts: this.app.config}).then(res.send.bind(res));
     })
 
