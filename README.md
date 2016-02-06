@@ -53,6 +53,7 @@ admin.provide('adminPage', 'Page Title', '/function', (req, res) => {
 - class: string
 - iconClass: string
 - nav: boolean
+- order: integer
 
 ### Admin Routes
 
