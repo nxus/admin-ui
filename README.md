@@ -25,7 +25,7 @@ You can define pages in three ways using the `adminPage` provider.
 If you supply a valid filepath, the Admin interface will use that partial to render the page content for display.
 
 ```
-admin.provide('adminPage', 'Page Title', '/partial', __dirname+"/views/page.ejs")
+admin.provide('adminPage', 'Page Title', '/partial', {iconClass: 'fa fa-file'}, __dirname+"/views/page.ejs")
 ```
 
 #### A string
@@ -40,25 +40,19 @@ admin.provide('adminPage', 'Page Title', '/content', {iconClass: 'fa fa-file'}, 
 
 #### A callback
 
-If you provide a callback, the return should either be nothing (in which case it is assumed you will redirect as appropriate)
+If you provide a callback, the return should either a string or a Promise for a string.
 
 ```
-admin.provide('adminRoute', 'Page Title', '/function', (req, res) => {
-  res.redirect('/admin')
-})
-```
-or a string or a Promise for a string.
-
-```
-admin.provide('adminRoute', 'Page Title', '/function', (req, res) => {
+admin.provide('adminPage', 'Page Title', '/function', (req, res) => {
   return Promise.resolve('Some text');
 })
 ```
 
 #### Page Configuration Options
 
-iconClass: string
-nav: boolean
+- class: string
+- iconClass: string
+- nav: boolean
 
 ### Admin Routes
 
