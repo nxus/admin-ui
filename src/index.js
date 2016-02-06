@@ -75,7 +75,6 @@ export default class AdminUI {
 
   _renderPage(req, res) {
     let route = req.route ? req.route.path : req.originalUrl
-    console.log('route', req.route)
     if(!this.pages[route] || !this.pages[route].handler) return
     let handler = this.pages[route].handler
     let title = this.pages[route].title
