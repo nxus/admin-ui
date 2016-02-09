@@ -1,4 +1,7 @@
 # Nxus Admin UI
+
+[![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
+
 An Admin UI Framework for Nxus Apps.
 
 ## Installation
