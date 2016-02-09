@@ -14,19 +14,18 @@ export default class AdminBase extends HasModels {
   constructor(app) {
     super(app)
     this.app = app
-    this.router = app.get('router')
     this.admin = app.get('admin-ui')
     this.templater = app.get('templater')
     this.base = this.base_url()
     this.prefix = this.template_prefix()
     this.populate = this.model_populate()
 
-    this.templater.provide('templateDir', 'ejs', this.template_dir(), this.prefix)
-    this.admin.provide('adminPage', pluralize(this.display_name()), this.base, {iconClass: 'fa fa-users'}, this._list.bind(this))
-    this.admin.provide('adminPage', 'New '+this.display_name(), this.base+'/new', {nav: false}, this._new.bind(this))
-    this.admin.provide('adminPage', 'Edit '+this.display_name(), this.base+'/edit/:id', {nav: false}, this._edit.bind(this)) 
-    this.admin.provide('adminRoute', 'get', this.base+'/delete/:id', this._delete.bind(this))
-    this.admin.provide('adminRoute', this.base+'/save', this.save.bind(this))
+    this.templater.templateDir('ejs', this.template_dir(), this.prefix)
+    this.admin.adminPage(pluralize(this.display_name()), this.base, {iconClass: 'fa fa-users'}, this._list.bind(this))
+    this.admin.adminPage('New '+this.display_name(), this.base+'/new', {nav: false}, this._new.bind(this))
+    this.admin.adminPage('Edit '+this.display_name(), this.base+'/edit/:id', {nav: false}, this._edit.bind(this)) 
+    this.admin.adminRoute('get', this.base+'/delete/:id', this._delete.bind(this))
+    this.admin.adminRoute('post', this.base+'/save', this.save.bind(this))
   }
 
   /**
@@ -91,7 +90,7 @@ export default class AdminBase extends HasModels {
       find = find.populate(...this.populate)
     }
     return find.then((insts) => {
-      return this.templater.request('render', this.prefix+'-list', {
+      return this.templater.render(this.prefix+'-list', {
         req,
         base: req.adminOpts.basePath+this.base,
         user: req.user,
@@ -107,7 +106,7 @@ export default class AdminBase extends HasModels {
       find = find.populate(...this.populate)
     }
     return find.then((inst) => {
-      return this.templater.request('render', this.prefix+'-form', {
+      return this.templater.render(this.prefix+'-form', {
         req,
         base: req.adminOpts.basePath+this.base,
         user: req.user,
@@ -121,7 +120,7 @@ export default class AdminBase extends HasModels {
     let inst = {}
     if(this.populate && this.populate.length > 0) 
       for (let pop of this.populate) inst[pop] = {}
-    return this.templater.request('render', this.prefix+'-form', {
+    return this.templater.render(this.prefix+'-form', {
       req,
       base: req.adminOpts.basePath+this.base,
       user: req.user,

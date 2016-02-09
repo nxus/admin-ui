@@ -31,23 +31,24 @@ export default class AdminUI {
     this.renderer = this.app.get('renderer')
     this.templater = this.app.get('templater')
 
-    this.app.get('admin-ui').gather('adminPage', this._registerPage.bind(this))
-    this.app.get('admin-ui').gather('adminRoute', this._registerRoute.bind(this))
+    this.app.get('admin-ui').use(this)
+      .gather('adminPage')
+      .gather('adminRoute')
 
     this._setupRoutes()
   }
 
   _setupRoutes() {
-    this.users.provide('protectedRoute', this.opts.basePath)
-    this.users.provide('protectedRoute', this.opts.basePath+'/*')
+    this.users.protectedRoute(this.opts.basePath)
+    this.users.protectedRoute(this.opts.basePath+'/*')
 
-    this.router.provide('middleware', 'use', this.opts.basePath+"/*", (req, res, next) => {
+    this.router.middleware('use', this.opts.basePath+"/*", (req, res, next) => {
       req.adminOpts = this.opts;
       next()
     })
   }
 
-  _registerPage(title, path, opts, handler) {
+  adminPage(title, path, opts, handler) {
     if(!handler) {
       handler = opts
       opts = {}
@@ -56,11 +57,11 @@ export default class AdminUI {
     path = this.opts.basePath+path
     this.app.log('registering admin page', path)
     this.pages[path] = {title, handler, opts}
-    this.router.provide('route', 'get', path, this._renderPage.bind(this))
+    this.router.route('get', path, this._renderPage.bind(this))
     if(opts && opts.nav != false) this.nav.push({title, path, opts})
   }
 
-  _registerRoute(method, path, handler) {
+  adminRoute(method, path, handler) {
     if(!handler) {
       handler = path
       path = method
@@ -70,7 +71,7 @@ export default class AdminUI {
     this.app.log('registering admin page', path)
     path = this.opts.basePath+path
     this.pages[path] = {handler}
-    this.router.provide('route', method, path, handler)
+    this.router.route(method, path, handler)
   }
 
   _renderPage(req, res) {
@@ -82,12 +83,12 @@ export default class AdminUI {
     
     if(typeof handler == 'string') {
       if(fs.existsSync(handler)) {
-        return this.templater.request("renderPartial", handler, this.opts.adminTemplate, {title, nav, opts: this.app.config}).then(res.send.bind(res));
+        return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config}).then(res.send.bind(res));
       }
-      return this.templater.request("render", this.opts.adminTemplate, {title, nav, content: handler, opts: this.app.config}).then(res.send.bind(res));
+      return this.templater.render(this.opts.adminTemplate, {title, nav, content: handler, opts: this.app.config}).then(res.send.bind(res));
     } else {
       return Promise.resolve(handler(req, res)).then((content) => {
-        if(content) this.templater.request("render", this.opts.adminTemplate, {title, nav, content, opts: this.app.config}).then(res.send.bind(res));
+        if(content) this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config}).then(res.send.bind(res));
       }).catch((e) => {
         this.app.log('Caught error rendering admin handler', e)
       })
