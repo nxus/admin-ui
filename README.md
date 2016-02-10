@@ -28,7 +28,7 @@ You can define pages in three ways using the `adminPage` provider.
 If you supply a valid filepath, the Admin interface will use that partial to render the page content for display.
 
 ```
-admin.provide('adminPage', 'Page Title', '/partial', {iconClass: 'fa fa-file'}, __dirname+"/views/page.ejs")
+admin.adminPage('Page Title', '/partial', {iconClass: 'fa fa-file'}, __dirname+"/views/page.ejs")
 ```
 
 #### A string
@@ -36,7 +36,7 @@ admin.provide('adminPage', 'Page Title', '/partial', {iconClass: 'fa fa-file'}, 
 If you provide a string, the string will be passed to the admin page template as is.
 
 ```
-admin.provide('adminPage', 'Page Title', '/content', {iconClass: 'fa fa-file'}, (req, res) => {
+admin.adminPage('Page Title', '/content', {iconClass: 'fa fa-file'}, (req, res) => {
   return "this is handler content"
 })
 ```
@@ -46,7 +46,7 @@ admin.provide('adminPage', 'Page Title', '/content', {iconClass: 'fa fa-file'}, 
 If you provide a callback, the return should either a string or a Promise for a string.
 
 ```
-admin.provide('adminPage', 'Page Title', '/function', (req, res) => {
+admin.adminPage('Page Title', '/function', (req, res) => {
   return Promise.resolve('Some text');
 })
 ```
@@ -63,7 +63,7 @@ admin.provide('adminPage', 'Page Title', '/function', (req, res) => {
 #### A handler function
 
 ```
-admin.provide('adminRoute', 'get', '/redirect', (req, res) => {
+admin.adminRoute('get', '/redirect', (req, res) => {
   res.redirect('/admin')
 })
 ```
