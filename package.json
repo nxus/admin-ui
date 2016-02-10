@@ -25,9 +25,9 @@
   "homepage": "https://github.com/nxus/admin-ui#readme",
   "peerDependencies": {
     "@nxus/core": "^2.3.0",
-    "@nxus/renderer": "^2.2.0",
-    "@nxus/templater": "^2.0.0",
-    "@nxus/storage": "^2.2.0"
+    "@nxus/renderer": "^2.3.0",
+    "@nxus/templater": "^2.3.0",
+    "@nxus/storage": "^2.3.0"
   },
   "devDependencies": {
     "babel": "^5.6.23",
