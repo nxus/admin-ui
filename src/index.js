@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-02-05
+* @Last Modified 2016-02-09
 */
 
 'use strict';
@@ -36,6 +36,8 @@ export default class AdminUI {
       .gather('adminRoute')
 
     this._setupRoutes()
+
+    this._addDefaultRoute()
   }
 
   _setupRoutes() {
@@ -45,6 +47,13 @@ export default class AdminUI {
     this.router.middleware('use', this.opts.basePath+"/*", (req, res, next) => {
       req.adminOpts = this.opts;
       next()
+    })
+  }
+
+  _addDefaultRoute() {
+    this.app.log('adding admin route')
+    this.provideAfter('adminPage', "Home", '', {iconClass: 'fa fa-home'}, (req, res) => {
+      return "Welcome to Nxus Admin!"
     })
   }
 
@@ -90,7 +99,7 @@ export default class AdminUI {
       return Promise.resolve(handler(req, res)).then((content) => {
         if(content) this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config}).then(res.send.bind(res));
       }).catch((e) => {
-        this.app.log('Caught error rendering admin handler', e)
+        this.app.log.error('Caught error rendering admin handler', e)
       })
     }
   }
