@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-05
+* @Last Modified 2016-02-12
 */
 
 'use strict';
@@ -9,6 +9,10 @@
 import {HasModels} from '@nxus/storage'
 import pluralize from 'pluralize'
 
+
+/**
+ * The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
+ */
 export default class AdminBase extends HasModels {
 
   constructor(app) {
