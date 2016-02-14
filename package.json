@@ -27,6 +27,7 @@
     "@nxus/core": "^2.3.0",
     "@nxus/renderer": "^2.3.0",
     "@nxus/templater": "^2.3.0",
+    "@nxus/router": "^2.3.0",
     "@nxus/storage": "^2.3.0"
   },
   "devDependencies": {
