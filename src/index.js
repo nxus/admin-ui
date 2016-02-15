@@ -18,6 +18,15 @@ const defaultOpts = {
 }
 
 export var AdminBase = adminBase
+/**
+ * The AdminUI module provides default templates and nav for an administrative section of your site.
+ *  If the @nxus/users module is installed, the admin section will require admin-level authentication.
+ * @example Configuration (defaults):
+ *  {adminUI: {
+ *    basePath: '/admin',    # urls registered for admin will start with this path
+ *    adminTemplate: 'admin' # name of the main admin template to use
+ *  }}
+ */
 
 export default class AdminUI {
   constructor(app) {
@@ -57,6 +66,19 @@ export default class AdminUI {
     })
   }
 
+  /**
+   * Register a page for inclusion in the admin site and navigation 
+   *  Page template will receive (and can set in opts):
+   *   - class: string
+   *   - iconClass: string
+   *   - nav: boolean
+   *   - order: integer
+   * @param {String} title The title of the page, and navigation link
+   * @param {String} path  The url path for the page
+   * @param {object} opts  Additional options for the rendering of this page
+   * @param {string|template-partial|function} handler for rendering this page
+   * @e
+   */
   adminPage(title, path, opts, handler) {
     if(!handler) {
       handler = opts
@@ -70,6 +92,12 @@ export default class AdminUI {
     if(opts && opts.nav != false) this.nav.push({title, path, opts})
   }
 
+  /**
+   * Register a raw route for inclusion in the admin site
+   * @param {String} method The HTTP method to handle
+   * @param {String} path  The url path for the page
+   * @param {function} handler for rendering this page
+   */
   adminRoute(method, path, handler) {
     if(!handler) {
       handler = path
