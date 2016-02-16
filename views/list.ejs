@@ -1,4 +1,4 @@
-<a class="btn btn-primary" href="<%= base %>/new"><i class="fa fa-plus"></i> Add <%= name %></a>
+<a class="btn btn-primary" href="<%= base %>/create"><i class="fa fa-plus"></i> Add <%= name %></a>
 <table class="table table-stripped">
     <thead>
         <tr>
@@ -20,7 +20,7 @@
             <% } %>
           <% }) %>
             <td class="bold"><a href="<%= base %>/edit/<%= u.id %>"><i class="fa fa-edit"></i></a>
-              <a href="<%= base %>/delete/<%= u.id %>" class="delete-confirm"><i class="fa fa-remove"></i></a></td>
+              <a href="<%= base %>/remove/<%= u.id %>" class="delete-confirm"><i class="fa fa-remove"></i></a></td>
         </tr>
       <% }) %>
         

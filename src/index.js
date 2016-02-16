@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-02-15
+* @Last Modified 2016-02-16
 */
 
 'use strict';
@@ -11,8 +11,11 @@ import fs from 'fs'
 import _ from 'underscore'
 import pluralize from 'pluralize'
 import capitalize from 'capitalize'
+import path from 'path'
 
-import AdminBase from './adminBase'
+import AdminBaseClass from './adminBase'
+
+export var AdminBase = AdminBaseClass
 
 const defaultOpts = {
   basePath: '/admin',
@@ -78,20 +81,28 @@ export default class AdminUI {
       method = 'post'
     }
     if(path[0] != "/") path = "/"+path
-    this.app.log('registering admin page', path)
     path = this.opts.basePath+path
+    this.app.log('registering admin route', path)
     this.pages[path] = {handler}
     this.router.route(method, path, handler)
   }
 
   adminModel(model, opts={}) {
-    this.app.log.debug('Setting admin crud', model, opts)
-    opts.model = model
-    opts.base = opts.base || "/"+pluralize(model)
-    opts.prefix = opts.prefix || model
-    opts.display_name = opts.display_name || capitalize(model)
-
-    new AdminBase(this.app, opts)
+    var adminModel;
+    if(_.isString(model) && model.indexOf(path.sep) == -1) {
+      this.app.log.debug('Loading admin model', model)
+      opts.model = model
+      adminModel = new AdminBase(this.app, opts)
+    } else if(_.isString(model) && model.indexOf(path.sep) > -1) {
+      if(fs.existsSync(model)) {
+        this.app.log.debug('Loading admin model file at', model)
+        model = require(model);
+        adminModel = new model(this.app)
+      } else
+        throw new Error('Class path '+model+' is not a valid file')
+    } else if(_.isFunction(model)) {
+      adminModel = new model(this.app)
+    }
   }
 
   _renderPage(req, res) {
