@@ -8,7 +8,6 @@
 
 import {HasModels} from '@nxus/storage'
 import pluralize from 'pluralize'
-import capitalize from 'capitalize'
 import _ from 'underscore'
 import morph from 'morph'
 

@@ -40,10 +40,8 @@
   "dependencies": {
     "babel-runtime": "^5.7.0",
     "bluebird": "^3.2.1",
-    "capitalize": "^1.0.0",
     "morph": "^0.2.0",
     "pluralize": "^1.2.1",
-    "split-camelcase": "^1.0.1",
     "underscore": "^1.7.0"
   }
 }

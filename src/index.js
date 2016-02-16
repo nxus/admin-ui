@@ -9,8 +9,6 @@
 import Promise from 'bluebird'
 import fs from 'fs'
 import _ from 'underscore'
-import pluralize from 'pluralize'
-import capitalize from 'capitalize'
 import path from 'path'
 
 import AdminBaseClass from './adminBase'
