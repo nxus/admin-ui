@@ -10,11 +10,7 @@ import {HasModels} from '@nxus/storage'
 import pluralize from 'pluralize'
 import capitalize from 'capitalize'
 import _ from 'underscore'
-
-const _adminModelOpts = {
-  iconClass: "fa fa-file"
-}
-
+import morph from 'morph'
 
 /**
  * The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
@@ -22,6 +18,10 @@ const _adminModelOpts = {
 export default class AdminBase extends HasModels {
 
   constructor(app, opts) {
+    const _adminModelOpts = {
+      iconClass: "fa fa-file"
+    }
+
     super(app)
 
     opts = _(_adminModelOpts).extend(opts)
@@ -30,6 +30,7 @@ export default class AdminBase extends HasModels {
     this.opts = opts
     this.admin = app.get('admin-ui')
     this.templater = app.get('templater')
+    this.opts.template_prefix = "admin-"+this.opts.display_name.toLowerCase()
 
     if(opts.template_dir)
       this.templater.templateDir('ejs', opts.template_dir, opts.prefix)
@@ -40,8 +41,9 @@ export default class AdminBase extends HasModels {
     this.admin.adminRoute('get', opts.base+'/delete/:id', this._delete.bind(this))
     this.admin.adminRoute('post', opts.base+'/save', this.save.bind(this))
 
-    this.templater.template(this.prefix+'-list', 'ejs', __dirname+"/../views/list.ejs")
-    this.templater.template(this.prefix+'-form', 'ejs', __dirname+"/../views/form.ejs")
+    this.app.log.debug('registering template', this.opts.template_prefix+'-list')
+    this.templater.template(this.opts.template_prefix+'-list', 'ejs', __dirname+"/../views/list.ejs")
+    this.templater.template(this.opts.template_prefix+'-form', 'ejs', __dirname+"/../views/form.ejs")
   }
 
   /**
@@ -60,14 +62,6 @@ export default class AdminBase extends HasModels {
     return this.opts.model_populate
   }
 
-  /**
-   * Define the template prefix for this admin module
-   * @return {string} 
-   */
-  template_prefix () {
-    return "admin-"+pluralize(this.opts.display_name).toLowerCase()
-  }
-
   model_names () {
     let ret = {}
     ret[this.model_id()] = 'model'
@@ -80,7 +74,7 @@ export default class AdminBase extends HasModels {
       find = find.populate(...this.populate)
     }
     return find.then((insts) => {
-      return this.templater.render(this.prefix+'-list', {
+      return this.templater.render(this.opts.template_prefix+'-list', {
         req,
         base: req.adminOpts.basePath+this.opts.base,
         user: req.user,
@@ -98,7 +92,7 @@ export default class AdminBase extends HasModels {
       find = find.populate(...this.populate)
     }
     return find.then((inst) => {
-      return this.templater.render(this.prefix+'-form', {
+      return this.templater.render(this.opts.template_prefix+'-form', {
         req,
         base: req.adminOpts.basePath+this.opts.base,
         user: req.user,
@@ -114,7 +108,7 @@ export default class AdminBase extends HasModels {
     let inst = {}
     if(this.populate && this.populate.length > 0) 
       for (let pop of this.populate) inst[pop] = {}
-    return this.templater.render(this.prefix+'-form', {
+    return this.templater.render(this.opts.template_prefix+'-form', {
       req,
       base: req.adminOpts.basePath+this.opts.base,
       user: req.user,
@@ -133,7 +127,7 @@ export default class AdminBase extends HasModels {
   }
 
   save (req, res) {
-    if(this.opts.save) return this.opts.save(req, res)
+    if(this.opts.save) return this.opts.save(req, res, this)
     else return this._save(req, res)
   }
 
@@ -149,11 +143,11 @@ export default class AdminBase extends HasModels {
   }
 
   _getAttrs(model) {
-    let ignore = ['id', 'createdAt', 'updatedAt']
+    let ignore = this.opts.ignore || ['id', 'createdAt', 'updatedAt']
     let ignoreType = ['objectId']
-    return _(model.definition)
+    return _(model._attributes)
     .keys()
-    .map((k) => {let ret = model.definition[k]; ret.name = k; ret.label = this._sanitizeName(k); return ret})
+    .map((k) => {let ret = model._attributes[k]; ret.name = k; if(!ret.label) ret.label = this._sanitizeName(k); return ret})
     .filter((k) => {
       let ret = _(ignore).contains(k.name) 
       if(!ret) ret = _(ignoreType).contains(k.type)
@@ -162,6 +156,6 @@ export default class AdminBase extends HasModels {
   }
 
   _sanitizeName(string) {
-    return capitalize.words(string.replace("_", " ").replace("-", ""))
+    return morph.toTitle(string)
   }
 }

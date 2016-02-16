@@ -84,7 +84,8 @@ export default class AdminUI {
     this.router.route(method, path, handler)
   }
 
-  adminModel(model, opts) {
+  adminModel(model, opts={}) {
+    this.app.log.debug('Setting admin crud', model, opts)
     opts.model = model
     opts.base = opts.base || "/"+pluralize(model)
     opts.prefix = opts.prefix || model
