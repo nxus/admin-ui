@@ -25,7 +25,7 @@ export default class AdminBase extends HasModels {
     this.templater = app.get('templater')
 
     if(this.templateDir())
-      this.templater.templateDir('ejs', this.templateDir(), this.prefix)
+      this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
     this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this.list.bind(this))
     this.admin.adminPage('New '+this.displayName(), this.base()+'/create', {nav: false}, this.create.bind(this))
@@ -46,10 +46,6 @@ export default class AdminBase extends HasModels {
    return this.opts.base || "/"+pluralize(this.model())
   }
 
-  prefix() {
-    return this.opts.prefix || this.model()
-  }
-
   iconClass() {
     return this.opts.iconClass || "fa fa-file"
   }
@@ -59,11 +55,11 @@ export default class AdminBase extends HasModels {
   }
 
   templatePrefix() {
-    return this.opts.templatePrefix || "admin-"+this.displayName().toLowerCase()
+    return this.opts.templatePrefix || "admin-"+morph.toDashed(this.model())
   }
 
   displayName() {
-    return this.opts.displayName || capitalize(this.model())
+    return this.opts.displayName || morph.toTitle(this.model())
   }
 
   /**
