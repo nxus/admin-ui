@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-02-09
+* @Last Modified 2016-02-15
 */
 
 'use strict';
@@ -9,15 +9,15 @@
 import Promise from 'bluebird'
 import fs from 'fs'
 import _ from 'underscore'
+import pluralize from 'pluralize'
+import capitalize from 'capitalize'
 
-import adminBase from './adminBase'
+import AdminBase from './adminBase'
 
 const defaultOpts = {
   basePath: '/admin',
   adminTemplate: 'admin'
 }
-
-export var AdminBase = adminBase
 
 export default class AdminUI {
   constructor(app) {
@@ -34,6 +34,7 @@ export default class AdminUI {
     this.app.get('admin-ui').use(this)
       .gather('adminPage')
       .gather('adminRoute')
+      .gather('adminModel')
 
     this._setupRoutes()
 
@@ -52,7 +53,7 @@ export default class AdminUI {
 
   _addDefaultRoute() {
     this.app.log('adding admin route')
-    this.provideAfter('adminPage', "Home", '', {iconClass: 'fa fa-home'}, (req, res) => {
+    this.provideBefore('adminPage', "Home", '', {nav: false}, (req, res) => {
       return "Welcome to Nxus Admin!"
     })
   }
@@ -83,9 +84,19 @@ export default class AdminUI {
     this.router.route(method, path, handler)
   }
 
+  adminModel(model, opts) {
+    opts.model = model
+    opts.base = opts.base || "/"+pluralize(model)
+    opts.prefix = opts.prefix || model
+    opts.display_name = opts.display_name || capitalize(model)
+
+    new AdminBase(this.app, opts)
+  }
+
   _renderPage(req, res) {
     let route = req.route ? req.route.path : req.originalUrl
-    if(!this.pages[route] || !this.pages[route].handler) return
+    if(!this.pages[route] || !this.pages[route].handler) return this.app.log.debug('No matching route', route)
+    this.app.log.debug('Rendering admin route', route)
     let handler = this.pages[route].handler
     let title = this.pages[route].title
     let nav = this._getNav();
@@ -96,10 +107,10 @@ export default class AdminUI {
       }
       return this.templater.render(this.opts.adminTemplate, {title, nav, content: handler, opts: this.app.config}).then(res.send.bind(res));
     } else {
-      return Promise.resolve(handler(req, res)).then((content) => {
-        if(content) this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config}).then(res.send.bind(res));
+      return Promise.try(() => { return handler(req, res)}).then((content) => {
+        return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config}).then(res.send.bind(res))
       }).catch((e) => {
-        this.app.log.error('Caught error rendering admin handler', e)
+        console.log('Caught error rendering admin handler', e, e.stack)
       })
     }
   }

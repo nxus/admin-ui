@@ -1,0 +1,29 @@
+<a class="btn btn-primary" href="<%= base %>/new"><i class="fa fa-plus"></i> Add <%= name %></a>
+<table class="table table-stripped">
+    <thead>
+        <tr>
+          <% attributes.forEach(function(attr) { %>
+            <th><%= attr.label %></th>
+          <% }) %>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+      <% insts.forEach(function(u) { %>
+        <tr>
+          <% attributes.forEach(function(attr) { %>
+            <% if(attr.type == 'password') return %>
+            <% if(attr.type == 'boolean') { %>
+            <td><%- u[attr.name] ? '<i class="fa fa-check"></i>' : '' %></td>
+            <% } else { %>
+            <td><%= u[attr.name] %></td>
+            <% } %>
+          <% }) %>
+            <td class="bold"><a href="<%= base %>/edit/<%= u.id %>"><i class="fa fa-edit"></i></a>
+              <a href="<%= base %>/delete/<%= u.id %>" class="delete-confirm"><i class="fa fa-remove"></i></a></td>
+        </tr>
+      <% }) %>
+        
+    </tbody>
+</table>
+
