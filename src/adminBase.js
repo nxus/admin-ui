@@ -12,6 +12,18 @@ import pluralize from 'pluralize'
 
 /**
  * The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
+ * @example class TodoAdmin extends AdminBase {
+ *  base_url () {
+ *     return '/admin/todo'
+ *   }
+ *  model_id () {
+ *     return 'todo'
+ *   }
+ *  template_dir () {
+ *     return __dirname+'/views'
+ *   }
+ * }
+ * 
  */
 export default class AdminBase extends HasModels {
 
