@@ -40,6 +40,7 @@
   "dependencies": {
     "babel-runtime": "^5.7.0",
     "bluebird": "^3.2.1",
+    "morph": "^0.2.0",
     "pluralize": "^1.2.1",
     "underscore": "^1.7.0"
   }

@@ -1,73 +1,110 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-12
+* @Last Modified 2016-02-17
 */
 
 'use strict';
 
 import {HasModels} from '@nxus/storage'
 import pluralize from 'pluralize'
-
+import _ from 'underscore'
+import morph from 'morph'
 
 /**
  * The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
+ * 
  * @example class TodoAdmin extends AdminBase {
- *  base_url () {
- *     return '/admin/todo'
+ *  base () {
+ *     return '/todo'
  *   }
- *  model_id () {
+ *  model () {
  *     return 'todo'
  *   }
- *  template_dir () {
+ *  templateDir () {
  *     return __dirname+'/views'
  *   }
  * }
  * 
  */
 export default class AdminBase extends HasModels {
-
-  constructor(app) {
+  constructor(app, opts={}) {
     super(app)
+
     this.app = app
+    this.opts = opts
     this.admin = app.get('admin-ui')
     this.templater = app.get('templater')
-    this.base = this.base_url()
-    this.prefix = this.template_prefix()
-    this.populate = this.model_populate()
 
-    this.templater.templateDir('ejs', this.template_dir(), this.prefix)
-    this.admin.adminPage(pluralize(this.display_name()), this.base, {iconClass: 'fa fa-users'}, this._list.bind(this))
-    this.admin.adminPage('New '+this.display_name(), this.base+'/new', {nav: false}, this._new.bind(this))
-    this.admin.adminPage('Edit '+this.display_name(), this.base+'/edit/:id', {nav: false}, this._edit.bind(this)) 
-    this.admin.adminRoute('get', this.base+'/delete/:id', this._delete.bind(this))
-    this.admin.adminRoute('post', this.base+'/save', this.save.bind(this))
+    if(this.templateDir())
+      this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
+
+    this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this.list.bind(this))
+    this.admin.adminPage('New '+this.displayName(), this.base()+'/create', {nav: false}, this.create.bind(this))
+    this.admin.adminPage('Edit '+this.displayName(), this.base()+'/edit/:id', {nav: false}, this.edit.bind(this)) 
+    this.admin.adminRoute('get', this.base()+'/remove/:id', this.remove.bind(this))
+    this.admin.adminRoute('post', this.base()+'/save', this.save.bind(this))
+
+    this.app.log.debug('registering template', this.templatePrefix()+'-list')
+    this.templater.template(this.templatePrefix()+'-list', 'ejs', __dirname+"/../views/list.ejs")
+    this.templater.template(this.templatePrefix()+'-form', 'ejs', __dirname+"/../views/form.ejs")
   }
 
   /**
-   * Define the base URL for this admin module
-   * @return {string} 
+   * Fields in the model to ignore in the UI
+   * @return {string}
    */
-  base_url () {
-    throw this.constructor.name+".base_url not implemented"
+  ignore() {
+    return this.opts.ignore || ['id', 'createdAt', 'updatedAt']
+  }
+
+  /**
+   * The base url for the Admin CRUD UI. 
+   * @return {string} Defaults to `/<models>`
+   */
+  base() {
+   return this.opts.base || "/"+pluralize(this.model())
+  }
+
+  /**
+   * The class to use for the nav icon.
+   * @return {string} Defaults to `fa fa-file`
+   */
+  iconClass() {
+    return this.opts.iconClass || "fa fa-file"
+  }
+
+  /**
+   * The directory to find the templates.
+   * @return {string} Defaults to null.
+   */
+  templateDir() {
+    return null
+  }
+
+  /**
+   * The prefix to use for the templates. Defaults to `admin-<model>-`
+   * @return {string}
+   */
+  templatePrefix() {
+    return this.opts.templatePrefix || "admin-"+morph.toDashed(this.model())
+  }
+
+  /**
+   * The display name for the model to use in the Admin UI
+   * @return {string} Defaults to `<model>`
+   */
+  displayName() {
+    return this.opts.displayName || morph.toTitle(this.model())
   }
 
   /**
    * Define the primary model for this admin module
    * @return {string} 
    */
-  model_id () {
-    throw this.constructor.name+".model_id not implemented"
-  }
-
-  /**
-   * Render the display name for the model
-   * @return {string} 
-   */
-  display_name () {
-    var name = this.model_id()
-    name = name[0].toUpperCase()+name.slice(1, name.length);
-    return name;
+  model() {
+    if(!this.opts.model) throw new Error(this.constructor.name+".model() not defined")
+    return this.opts.model
   }
 
   /**
@@ -75,28 +112,12 @@ export default class AdminBase extends HasModels {
    * @return {array} 
    */
   model_populate () {
-    return null
-  }
-  
-  /**
-   * Define the template dir - needs to be implemented for local __dirname
-   * @return {string} 
-   */
-  template_dir () {
-    throw this.constructor.name+".template_dir not implemented"
-  }
-
-  /**
-   * Define the template prefix for this admin module
-   * @return {string} 
-   */
-  template_prefix () {
-    return "admin-"+pluralize(this.display_name()).toLowerCase()
+    return this.opts.modelPopulate
   }
 
   model_names () {
     let ret = {}
-    ret[this.model_id()] = 'model'
+    ret[this.model()] = 'model'
     return ret;
   }
   
@@ -106,14 +127,16 @@ export default class AdminBase extends HasModels {
       find = find.populate(...this.populate)
     }
     return find.then((insts) => {
-      return this.templater.render(this.prefix+'-list', {
+      return this.templater.render(this.templatePrefix()+'-list', {
         req,
-        base: req.adminOpts.basePath+this.base,
+        base: req.adminOpts.basePath+this.base(),
         user: req.user,
         title: 'All '+this.constructor.name,
-        insts
+        insts,
+        name: this.displayName(),
+        attributes: this._getAttrs(this.models.model)
       });
-    })
+    }).catch((e) => {console.log('caught on find', e)})
   }
 
   _edit (req, res) {
@@ -122,34 +145,54 @@ export default class AdminBase extends HasModels {
       find = find.populate(...this.populate)
     }
     return find.then((inst) => {
-      return this.templater.render(this.prefix+'-form', {
+      return this.templater.render(this.templatePrefix()+'-form', {
         req,
-        base: req.adminOpts.basePath+this.base,
+        base: req.adminOpts.basePath+this.base(),
         user: req.user,
         title: 'Edit '+this.constructor.name,
-        inst
+        inst,
+        name: this.displayName(),
+        attributes: this._getAttrs(this.models.model)
       })
     })
   }
 
-  _new (req, res) {
+  _create (req, res) {
     let inst = {}
     if(this.populate && this.populate.length > 0) 
       for (let pop of this.populate) inst[pop] = {}
-    return this.templater.render(this.prefix+'-form', {
+    return this.templater.render(this.templatePrefix()+'-form', {
       req,
-      base: req.adminOpts.basePath+this.base,
+      base: req.adminOpts.basePath+this.base(),
       user: req.user,
       title: 'New '+this.constructor.name,
-      inst
+      inst,
+      name: this.displayName(),
+      attributes: this._getAttrs(this.models.model)
     })
   }
 
-  _delete (req, res) {
+  _remove (req, res) {
     return this.models.model.destroy(req.params.id).then((inst) => {
-      req.flash('info', this.display_name()+' deleted');
-      res.redirect(req.adminOpts.basePath+this.base)
+      req.flash('info', this.displayName()+' deleted');
+      res.redirect(req.adminOpts.basePath+this.base())
     })
+  }
+
+  remove(req, res) {
+    return this._remove(req, res)
+  }
+
+  create(req, res) {
+    return this._create(req, res)
+  }
+
+  edit(req, res) {
+    return this._edit(req, res)
+  }
+
+  list(req, res) {
+    return this._list(req, res)
   }
 
   save (req, res) {
@@ -164,6 +207,23 @@ export default class AdminBase extends HasModels {
       ? this.models.model.update(values.id, values)
       : this.models.model.create(values)
 
-    promise.then((u) => {req.flash('info', this.display_name()+' created');; res.redirect(req.adminOpts.basePath+this.base)})
+    promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(req.adminOpts.basePath+this.base())})
+  }
+
+  _getAttrs(model) {
+    let ignore = this.ignore()
+    let ignoreType = ['objectId']
+    return _(model._attributes)
+    .keys()
+    .map((k) => {let ret = model._attributes[k]; ret.name = k; if(!ret.label) ret.label = this._sanitizeName(k); return ret})
+    .filter((k) => {
+      let ret = _(ignore).contains(k.name) 
+      if(!ret) ret = _(ignoreType).contains(k.type)
+      return !ret
+    })
+  }
+
+  _sanitizeName(string) {
+    return morph.toTitle(string)
   }
 }

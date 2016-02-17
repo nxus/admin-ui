@@ -5,13 +5,13 @@ import AdminBase from '../src/adminBase'
 import TestApp from '@nxus/core/lib/test/support/TestApp';
 
 class AdminTest extends AdminBase {
-  base_url () {
+  base () {
     return "/test"
   }
-  model_id () {
-    return 'test_model'
+  model () {
+    return 'testModel'
   }
-  template_dir () {
+  templateDir () {
     return './views'
   }
 }
@@ -38,19 +38,19 @@ describe("AdminBase", () => {
     });
 
     it("should have a base url", () => {
-      module.base.should.equal('/test');
+      module.base().should.equal('/test');
     });
     
     it("should have routes", () => {
-      app.get('admin-ui').provide.calledWith('adminPage', 'Test_models', '/test').should.be.true;
-      app.get('admin-ui').provide.calledWith('adminPage', 'New Test_model', '/test/new').should.be.true;
-      app.get('admin-ui').provide.calledWith('adminPage', 'Edit Test_model', '/test/edit/:id').should.be.true;
-      app.get('admin-ui').provide.calledWith('adminRoute', 'get', '/test/delete/:id').should.be.true;
+      app.get('admin-ui').provide.calledWith('adminPage', 'Test Models', '/test').should.be.true;
+      app.get('admin-ui').provide.calledWith('adminPage', 'New Test Model', '/test/create').should.be.true;
+      app.get('admin-ui').provide.calledWith('adminPage', 'Edit Test Model', '/test/edit/:id').should.be.true;
+      app.get('admin-ui').provide.calledWith('adminRoute', 'get', '/test/remove/:id').should.be.true;
       app.get('admin-ui').provide.calledWith('adminRoute', 'post', '/test/save').should.be.true;
     });
     
     it("should have a template prefix", () => {
-      module.prefix.should.equal('admin-test_models');
+      module.templatePrefix().should.equal('admin-test-model');
     })
   });
 });
