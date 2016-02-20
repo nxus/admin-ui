@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-02-17
+* @Last Modified 2016-02-19
 */
 
 'use strict';
@@ -17,7 +17,8 @@ export var AdminBase = AdminBaseClass
 
 const defaultOpts = {
   basePath: '/admin',
-  adminTemplate: 'admin'
+  adminTemplate: 'admin',
+  limitToAdmin: true
 }
 
 /**
@@ -55,14 +56,24 @@ export default class AdminUI {
     this.users.protectedRoute(this.opts.basePath)
     this.users.protectedRoute(this.opts.basePath+'/*')
 
-    this.router.middleware('use', this.opts.basePath+"/*", (req, res, next) => {
+    if(this.opts.limitToAdmin) {
+      this.users.ensureAdmin(this.opts.basePath)
+      this.users.ensureAdmin(this.opts.basePath+'/*')
+    }
+
+    this.router.provideBefore('middleware', this.opts.basePath+"/*", (req, res, next) => {
+      req.adminOpts = this.opts;
+      next()
+    })
+
+    this.router.provideBefore('middleware', this.opts.basePath, (req, res, next) => {
       req.adminOpts = this.opts;
       next()
     })
   }
 
   _addDefaultRoute() {
-    this.app.log('adding admin route')
+    this.app.log.debug('adding admin route')
     this.provideBefore('adminPage', "Home", '', {nav: false}, (req, res) => {
       return "Welcome to Nxus Admin!"
     })

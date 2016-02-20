@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-17
+* @Last Modified 2016-02-19
 */
 
 'use strict';
@@ -45,9 +45,8 @@ export default class AdminBase extends HasModels {
     this.admin.adminRoute('get', this.base()+'/remove/:id', this.remove.bind(this))
     this.admin.adminRoute('post', this.base()+'/save', this.save.bind(this))
 
-    this.app.log.debug('registering template', this.templatePrefix()+'-list')
-    this.templater.template(this.templatePrefix()+'-list', 'ejs', __dirname+"/../views/list.ejs")
-    this.templater.template(this.templatePrefix()+'-form', 'ejs', __dirname+"/../views/form.ejs")
+    this.templater.provideBefore('template', this.templatePrefix()+'-list', 'ejs', __dirname+"/../views/list.ejs")
+    this.templater.provideBefore('template', this.templatePrefix()+'-form', 'ejs', __dirname+"/../views/form.ejs")
   }
 
   /**
@@ -117,95 +116,105 @@ export default class AdminBase extends HasModels {
 
   model_names () {
     let ret = {}
-    ret[this.model()] = 'model'
+    ret[this.model()] = this.model()
     return ret;
   }
   
-  _list (req, res) {
-    let find = this.models.model.find().where({})
+  _list (req, res, opts = {}) {
+    let find = this.models[this.model()].find().where({})
     if (this.populate) {
       find = find.populate(...this.populate)
     }
     return find.then((insts) => {
-      return this.templater.render(this.templatePrefix()+'-list', {
+      opts = _.extend({
         req,
         base: req.adminOpts.basePath+this.base(),
         user: req.user,
         title: 'All '+this.constructor.name,
-        insts,
         name: this.displayName(),
-        attributes: this._getAttrs(this.models.model)
-      });
+        insts,
+        attributes: this._getAttrs(this.models[this.model()])
+      }, opts)
+      if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
+      else opts.insts = opts[pluralize(this.model())]
+      return this.templater.render(this.templatePrefix()+'-list', opts);
     }).catch((e) => {console.log('caught on find', e)})
   }
 
-  _edit (req, res) {
-    let find = this.models.model.findOne().where(req.params.id)
+  _edit (req, res, opts = {}) {
+    let find = this.models[this.model()].findOne().where(req.params.id)
     if (this.populate) {
       find = find.populate(...this.populate)
     }
     return find.then((inst) => {
-      return this.templater.render(this.templatePrefix()+'-form', {
+      opts = _.extend({
         req,
         base: req.adminOpts.basePath+this.base(),
         user: req.user,
         title: 'Edit '+this.constructor.name,
         inst,
         name: this.displayName(),
-        attributes: this._getAttrs(this.models.model)
-      })
+        attributes: this._getAttrs(this.models[this.model()])
+      }, opts)
+      if(!opts[this.model()]) opts[this.model()] = inst
+      else opts.inst = opts[this.model()]
+      return this.templater.render(this.templatePrefix()+'-form', opts)
     })
   }
 
-  _create (req, res) {
+  _create (req, res, opts = {}) {
     let inst = {}
     if(this.populate && this.populate.length > 0) 
       for (let pop of this.populate) inst[pop] = {}
-    return this.templater.render(this.templatePrefix()+'-form', {
-      req,
-      base: req.adminOpts.basePath+this.base(),
-      user: req.user,
-      title: 'New '+this.constructor.name,
-      inst,
-      name: this.displayName(),
-      attributes: this._getAttrs(this.models.model)
-    })
+    opts = _.extend({
+        req,
+        base: req.adminOpts.basePath+this.base(),
+        title: 'New '+this.constructor.name,
+        inst,
+        name: this.displayName(),
+        attributes: this._getAttrs(this.models[this.model()])
+      }, opts)
+    if(!opts[this.model()]) opts[this.model()] = inst
+    else opts.inst = opts[this.model()]
+    return this.templater.render(this.templatePrefix()+'-form', opts)
   }
 
-  _remove (req, res) {
-    return this.models.model.destroy(req.params.id).then((inst) => {
+  _remove (req, res, opts = {}) {
+    return this.models[this.model()].destroy(req.params.id).then((inst) => {
       req.flash('info', this.displayName()+' deleted');
       res.redirect(req.adminOpts.basePath+this.base())
     })
   }
 
-  remove(req, res) {
-    return this._remove(req, res)
+  remove(req, res, opts = {}) {
+    return this._remove(req, res, opts)
   }
 
-  create(req, res) {
-    return this._create(req, res)
+  create(req, res, opts = {}) {
+    return this._create(req, res, opts)
   }
 
-  edit(req, res) {
-    return this._edit(req, res)
+  edit(req, res, opts = {}) {
+    return this._edit(req, res, opts)
   }
 
-  list(req, res) {
-    return this._list(req, res)
+  list(req, res, opts = {}) {
+    return this._list(req, res, opts)
   }
 
-  save (req, res) {
-    return this._save(req, res)
+  save (req, res, opts = {}) {
+    return this._save(req, res, opts)
   }
 
-  _save (req, res, values) {
-    if (values === undefined) {
+  _save (req, res, opts = {}) {
+    let values
+    if (opts[this.model()] === undefined)
       values = req.body
-    }
+    else
+      values = opts[this.model()]
     let promise = values.id
-      ? this.models.model.update(values.id, values)
-      : this.models.model.create(values)
+      ? this.models[this.model()].update(values.id, values)
+      : this.models[this.model()].create(values)
 
     promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(req.adminOpts.basePath+this.base())})
   }
