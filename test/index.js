@@ -33,7 +33,7 @@ describe("AdminUI", () => {
     it("should have protected routes", () => {
       app.get('users').provide.calledWith('protectedRoute', '/admin').should.be.true
       app.get('users').provide.calledWith('protectedRoute', '/admin/*').should.be.true
-      app.get('router').provide.calledWith('middleware', 'use').should.be.true
+      app.get('router').provideBefore.calledWith('middleware').should.be.true
     });
     
   });
