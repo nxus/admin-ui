@@ -241,12 +241,12 @@ export default class AdminUI {
     
     if(typeof handler == 'string') {
       if(fs.existsSync(handler)) {
-        return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config}).then(res.send.bind(res));
+        return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config, req}).then(res.send.bind(res));
       }
-      return this.templater.render(this.opts.adminTemplate, {title, nav, content: handler, opts: this.app.config}).then(res.send.bind(res));
+      return this.templater.render(this.opts.adminTemplate, {title, nav, content: handler, opts: this.app.config, req}).then(res.send.bind(res));
     } else {
       return Promise.try(() => { return handler(req, res)}).then((content) => {
-        return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config}).then(res.send.bind(res))
+        return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config, req}).then(res.send.bind(res))
       }).catch((e) => {
         console.log('Caught error rendering admin handler', e, e.stack)
       })
