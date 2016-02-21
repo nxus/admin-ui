@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-19
+* @Last Modified 2016-02-20
 */
 
 'use strict';
@@ -129,7 +129,6 @@ export default class AdminBase extends HasModels {
       opts = _.extend({
         req,
         base: req.adminOpts.basePath+this.base(),
-        user: req.user,
         title: 'All '+this.constructor.name,
         name: this.displayName(),
         insts,
@@ -150,7 +149,6 @@ export default class AdminBase extends HasModels {
       opts = _.extend({
         req,
         base: req.adminOpts.basePath+this.base(),
-        user: req.user,
         title: 'Edit '+this.constructor.name,
         inst,
         name: this.displayName(),
