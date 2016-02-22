@@ -135,7 +135,7 @@ export default class AdminBase extends HasModels {
         base: req.adminOpts.basePath+this.base(),
         title: 'All '+this.constructor.name,
         name: this.displayName(),
-          insts,
+        insts,
         attributes: attributes
       }, opts)
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
