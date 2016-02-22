@@ -145,6 +145,7 @@ export default class AdminBase extends HasModels {
     if (this.populate) {
       find = find.populate(...this.populate)
     }
+    console.log("attrs", this._getAttrs(this.models[this.model()]))
     return find.then((inst) => {
       opts = _.extend({
         req,
