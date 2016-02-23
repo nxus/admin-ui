@@ -202,6 +202,8 @@ export default class AdminUI {
    *   * `admin-<model>-form`: the create/edit form
    *   * `admin-<model>-list`: the list page view
    * 
+   * The generated form for edit/create currently handles simple types (string, float, boolean, etc) and foreign key fields as a dropdown of all the related models.
+   * 
    * Options available are:
    *   * `base`: the url at which the CRUD paths are created. For example, '/users'.
    *   * `iconClass`: the icon class to use in the Nav. Used in <i> tag.
