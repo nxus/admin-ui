@@ -115,10 +115,8 @@ export default class AdminBase extends HasModels {
     return this.opts.modelPopulate || []
   }
 
-  model_names () {
-    let ret = {}
-    ret[this.model()] = this.model()
-    return ret;
+  modelNames () {
+    return [this.model()]
   }
   
   _list (req, res, opts = {}) {
