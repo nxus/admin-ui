@@ -10,6 +10,7 @@ import {HasModels} from '@nxus/storage'
 import pluralize from 'pluralize'
 import _ from 'underscore'
 import morph from 'morph'
+import Promise from 'bluebird'
 
 /**
  * The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
@@ -35,7 +36,7 @@ export default class AdminBase extends HasModels {
     this.opts = opts
     this.admin = app.get('admin-ui')
     this.templater = app.get('templater')
-
+    
     if(this.templateDir())
       this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
@@ -110,8 +111,8 @@ export default class AdminBase extends HasModels {
    * Define any populated relationships for the model
    * @return {array} 
    */
-  model_populate () {
-    return this.opts.modelPopulate
+  modelPopulate () {
+    return this.opts.modelPopulate || []
   }
 
   model_names () {
@@ -125,14 +126,17 @@ export default class AdminBase extends HasModels {
     if (this.populate) {
       find = find.populate(...this.populate)
     }
-    return find.then((insts) => {
+    return Promise.all([
+      find,
+      this._getAttrs(this.models[this.model()], false)
+    ]).spread((insts, attributes) => {
       opts = _.extend({
         req,
         base: req.adminOpts.basePath+this.base(),
         title: 'All '+this.constructor.name,
         name: this.displayName(),
         insts,
-        attributes: this._getAttrs(this.models[this.model()])
+        attributes: attributes
       }, opts)
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
@@ -145,14 +149,17 @@ export default class AdminBase extends HasModels {
     if (this.populate) {
       find = find.populate(...this.populate)
     }
-    return find.then((inst) => {
+    return Promise.all([
+      find,
+      this._getAttrs(this.models[this.model()])
+    ]).spread((inst, attributes) => {
       opts = _.extend({
         req,
         base: req.adminOpts.basePath+this.base(),
         title: 'Edit '+this.constructor.name,
         inst,
         name: this.displayName(),
-        attributes: this._getAttrs(this.models[this.model()])
+        attributes: attributes
       }, opts)
       if(!opts[this.model()]) opts[this.model()] = inst
       else opts.inst = opts[this.model()]
@@ -164,17 +171,21 @@ export default class AdminBase extends HasModels {
     let inst = {}
     if(this.populate && this.populate.length > 0) 
       for (let pop of this.populate) inst[pop] = {}
-    opts = _.extend({
+    return Promise.all([
+      this._getAttrs(this.models[this.model()])
+    ]).spread((attributes) => {
+      opts = _.extend({
         req,
         base: req.adminOpts.basePath+this.base(),
         title: 'New '+this.constructor.name,
         inst,
         name: this.displayName(),
-        attributes: this._getAttrs(this.models[this.model()])
+        attributes: attributes
       }, opts)
-    if(!opts[this.model()]) opts[this.model()] = inst
-    else opts.inst = opts[this.model()]
-    return this.templater.render(this.templatePrefix()+'-form', opts)
+      if(!opts[this.model()]) opts[this.model()] = inst
+      else opts.inst = opts[this.model()]
+      return this.templater.render(this.templatePrefix()+'-form', opts)
+    })      
   }
 
   _remove (req, res, opts = {}) {
@@ -217,17 +228,40 @@ export default class AdminBase extends HasModels {
     promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(req.adminOpts.basePath+this.base())})
   }
 
-  _getAttrs(model) {
+  _getAttrs(model, withRelated=true) {
     let ignore = this.ignore()
     let ignoreType = ['objectId']
-    return _(model._attributes)
+    let related = []
+    let attrs = _(model._attributes)
     .keys()
-    .map((k) => {let ret = model._attributes[k]; ret.name = k; if(!ret.label) ret.label = this._sanitizeName(k); return ret})
+    .map((k, i) => {
+      let ret = model._attributes[k]
+      ret.name = k
+      if(!ret.label) ret.label = this._sanitizeName(k)
+      if(ret.model) {
+        ret.type = 'related'
+        related.push(ret)
+      }
+      return ret
+    })
     .filter((k) => {
       let ret = _(ignore).contains(k.name) 
       if(!ret) ret = _(ignoreType).contains(k.type)
       return !ret
     })
+    if (!withRelated || _.isEmpty(related)) {
+      return attrs
+    } else {
+      return Promise.map(related, (rel) => {
+        return this.app.get('storage').getModel(rel.model).then((m) => {
+          return m.find()
+        }).then((rel_insts) => {
+          rel.instances = rel_insts
+        })
+      }).then(() => {
+        return attrs
+      })
+    }
   }
 
   _sanitizeName(string) {
