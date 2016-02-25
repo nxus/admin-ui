@@ -114,7 +114,7 @@ Define the primary model for this admin module
 
 Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
-### model\_populate
+### modelPopulate
 
 Define any populated relationships for the model
 
@@ -166,6 +166,8 @@ Views which can be overriden are:
 
 -   `admin-<model>-form`: the create/edit form
 -   `admin-<model>-list`: the list page view
+
+The generated form for edit/create currently handles simple types (string, float, boolean, etc) and foreign key fields as a dropdown of all the related models.
 
 Options available are:
 
