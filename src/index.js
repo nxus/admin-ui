@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-02-20
+* @Last Modified 2016-02-25
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -256,9 +256,11 @@ export default class AdminUI {
   }
 
   _getNav() {
+    let i = 0
     return _.sortBy(this.nav, (n) => {
       if(n.opts && n.opts.order) return n.opts.order
-      return 10000000;
+      i++;
+      return i;
     })
   }
 }

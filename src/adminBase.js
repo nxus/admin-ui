@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-24
+* @Last Modified 2016-02-25
 */
 
 'use strict';
@@ -56,6 +56,14 @@ export default class AdminBase extends HasModels {
    */
   ignore() {
     return this.opts.ignore || ['id', 'createdAt', 'updatedAt']
+  }
+
+  /**
+   * Fields in the model to show
+   * @return {array}
+   */
+  display() {
+    return this.opts.display || []
   }
 
   /**
@@ -231,6 +239,7 @@ export default class AdminBase extends HasModels {
 
   _getAttrs(model, withRelated=true) {
     let ignore = this.ignore()
+    let display = this.display()
     let ignoreType = ['objectId']
     let related = []
     let attrs = _(model._attributes)
@@ -244,6 +253,12 @@ export default class AdminBase extends HasModels {
         related.push(ret)
       }
       return ret
+    })    
+    .filter((k) => {
+      if(display.length > 0)
+        return _(display).contains(k.name)
+      else
+        return true
     })
     .filter((k) => {
       let ret = _(ignore).contains(k.name) 
