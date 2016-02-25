@@ -90,6 +90,12 @@ The base url for the Admin CRUD UI.
 
 Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to `/<models>`
 
+### display
+
+Fields in the model to show
+
+Returns **[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)** 
+
 ### displayName
 
 The display name for the model to use in the Admin UI
