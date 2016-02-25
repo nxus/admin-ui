@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-20
+* @Last Modified 2016-02-24
 */
 
 'use strict';
@@ -112,10 +112,11 @@ export default class AdminBase extends HasModels {
    * @return {array} 
    */
   modelPopulate () {
+    console.log('returning', this.opts.modelPopulate)
     return this.opts.modelPopulate || []
   }
 
-  model_names () {
+  modelNames () {
     let ret = {}
     ret[this.model()] = this.model()
     return ret;
@@ -123,8 +124,8 @@ export default class AdminBase extends HasModels {
   
   _list (req, res, opts = {}) {
     let find = this.models[this.model()].find().where({})
-    if (this.populate) {
-      find = find.populate(...this.populate)
+    if (this.modelPopulate() && this.modelPopulate().length > 0) {
+      find = find.populate(...this.modelPopulate())
     }
     return Promise.all([
       find,
@@ -146,8 +147,8 @@ export default class AdminBase extends HasModels {
 
   _edit (req, res, opts = {}) {
     let find = this.models[this.model()].findOne().where(req.params.id)
-    if (this.populate) {
-      find = find.populate(...this.populate)
+    if (this.modelPopulate() && this.modelPopulate().length > 0) {
+      find = find.populate(...this.modelPopulate())
     }
     return Promise.all([
       find,
@@ -169,8 +170,8 @@ export default class AdminBase extends HasModels {
 
   _create (req, res, opts = {}) {
     let inst = {}
-    if(this.populate && this.populate.length > 0) 
-      for (let pop of this.populate) inst[pop] = {}
+    if(this.modelPopulate() && this.modelPopulate().length > 0) 
+      for (let pop of this.modelPopulate()) inst[pop] = {}
     return Promise.all([
       this._getAttrs(this.models[this.model()])
     ]).spread((attributes) => {
