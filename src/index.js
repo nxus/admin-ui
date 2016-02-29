@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-02-25
+* @Last Modified 2016-02-26
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -123,7 +123,7 @@ export default class AdminUI {
       this.users.ensureAdmin(this.opts.basePath+'/*')
     }
 
-    this.router.provideBefore('middleware', this.opts.basePath+"/*", (req, res, next) => {
+    this.router.default().middleware(this.opts.basePath+"/*", (req, res, next) => {
       req.adminOpts = this.opts;
       next()
     })
@@ -136,7 +136,7 @@ export default class AdminUI {
 
   _addDefaultRoute() {
     this.app.log.debug('adding admin route')
-    this.provideBefore('adminPage', "Home", '', {nav: false}, (req, res) => {
+    this.default().adminPage("Home", '', {nav: false}, (req, res) => {
       return "Welcome to Nxus Admin!"
     })
   }

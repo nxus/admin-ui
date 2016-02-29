@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-25
+* @Last Modified 2016-02-26
 */
 
 'use strict';
@@ -40,14 +40,14 @@ export default class AdminBase extends HasModels {
     if(this.templateDir())
       this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
-    this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this.list.bind(this))
-    this.admin.adminPage('New '+this.displayName(), this.base()+'/create', {nav: false}, this.create.bind(this))
-    this.admin.adminPage('Edit '+this.displayName(), this.base()+'/edit/:id', {nav: false}, this.edit.bind(this)) 
-    this.admin.adminRoute('get', this.base()+'/remove/:id', this.remove.bind(this))
-    this.admin.adminRoute('post', this.base()+'/save', this.save.bind(this))
+    this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this._list.bind(this))
+    this.admin.adminPage('New '+this.displayName(), this.base()+'/create', {nav: false}, this._create.bind(this))
+    this.admin.adminPage('Edit '+this.displayName(), this.base()+'/edit/:id', {nav: false}, this._edit.bind(this)) 
+    this.admin.adminRoute('get', this.base()+'/remove/:id', this._remove.bind(this))
+    this.admin.adminRoute('post', this.base()+'/save', this._save.bind(this))
 
-    this.templater.provideBefore('template', this.templatePrefix()+'-list', 'ejs', __dirname+"/../views/list.ejs")
-    this.templater.provideBefore('template', this.templatePrefix()+'-form', 'ejs', __dirname+"/../views/form.ejs")
+    this.templater.default().template(this.templatePrefix()+'-list', 'ejs', __dirname+"/../views/list.ejs")
+    this.templater.default().template(this.templatePrefix()+'-form', 'ejs', __dirname+"/../views/form.ejs")
   }
 
   /**
@@ -124,6 +124,10 @@ export default class AdminBase extends HasModels {
     return this.opts.modelPopulate || []
   }
 
+  /**
+   * Returns a hash of currently used models.
+   * @return {[type]} [description]
+   */
   modelNames () {
     let ret = {}
     ret[this.model()] = this.model()
@@ -204,26 +208,6 @@ export default class AdminBase extends HasModels {
     })
   }
 
-  remove(req, res, opts = {}) {
-    return this._remove(req, res, opts)
-  }
-
-  create(req, res, opts = {}) {
-    return this._create(req, res, opts)
-  }
-
-  edit(req, res, opts = {}) {
-    return this._edit(req, res, opts)
-  }
-
-  list(req, res, opts = {}) {
-    return this._list(req, res, opts)
-  }
-
-  save (req, res, opts = {}) {
-    return this._save(req, res, opts)
-  }
-
   _save (req, res, opts = {}) {
     let values
     if (opts[this.model()] === undefined)
@@ -271,8 +255,8 @@ export default class AdminBase extends HasModels {
       return Promise.map(related, (rel) => {
         return this.app.get('storage').getModel(rel.model).then((m) => {
           return m.find()
-        }).then((rel_insts) => {
-          rel.instances = rel_insts
+        }).then((relInsts) => {
+          rel.instances = relInsts
         })
       }).then(() => {
         return attrs
