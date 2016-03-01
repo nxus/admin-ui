@@ -44,6 +44,7 @@ export default class AdminBase extends HasModels {
       this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
     if(this.uploadType()) {
+      // TODO AdminBase really needs access to adminOpts at all times, not via req.adminOpts middleware
       app.get('router').middleware('/admin'+this.base()+"/import/save", upload.single('file'))
       this.admin.adminPage('Import '+pluralize(this.displayName()), this.base()+'/import', {nav: false}, this._import.bind(this))
       this.admin.adminRoute('POST', this.base()+'/import/save', this._saveImport.bind(this))
