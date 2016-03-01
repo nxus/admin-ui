@@ -11,6 +11,9 @@ import pluralize from 'pluralize'
 import _ from 'underscore'
 import morph from 'morph'
 import Promise from 'bluebird'
+import multer from 'multer';
+
+var upload = multer({ dest: process.cwd()+'/uploads/'})
 
 /**
  * The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
@@ -40,6 +43,13 @@ export default class AdminBase extends HasModels {
     if(this.templateDir())
       this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
+    if(this.uploadType()) {
+      app.get('router').middleware('/admin'+this.base()+"/import/save", upload.single('file'))
+      this.admin.adminPage('Import '+pluralize(this.displayName()), this.base()+'/import', {nav: false}, this._import.bind(this))
+      this.admin.adminRoute('POST', this.base()+'/import/save', this._saveImport.bind(this))
+      this.templater.default().template(this.templatePrefix()+'-import', 'ejs', __dirname+"/../views/import.ejs")
+    }
+    
     this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this._list.bind(this))
     this.admin.adminPage('New '+this.displayName(), this.base()+'/create', {nav: false}, this._create.bind(this))
     this.admin.adminPage('Edit '+this.displayName(), this.base()+'/edit/:id', {nav: false}, this._edit.bind(this)) 
@@ -133,6 +143,21 @@ export default class AdminBase extends HasModels {
     ret[this.model()] = this.model()
     return ret;
   }
+
+  /**
+   * Allow upload of models by file type
+   * @return {string}
+   */
+  uploadType() {
+    return this.opts.uploadType || null
+  }
+  /**
+   * Allow upload of models by file type
+   * @return {string}
+   */
+  uploadOptions() {
+    return this.opts.uploadOptions || {}
+  }
   
   _list (req, res, opts = {}) {
     let find = this.models[this.model()].find().where({})
@@ -149,7 +174,8 @@ export default class AdminBase extends HasModels {
         title: 'All '+this.constructor.name,
         name: this.displayName(),
         insts,
-        attributes: attributes
+        attributes: attributes,
+        upload: this.uploadType()
       }, opts)
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
@@ -219,6 +245,24 @@ export default class AdminBase extends HasModels {
       : this.models[this.model()].create(values)
 
     promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(req.adminOpts.basePath+this.base())})
+  }
+
+  _import (req, res) {
+    let opts = {
+      base: req.adminOpts.basePath+this.base(),
+      name: this.displayName()
+    }
+    return this.templater.render(this.templatePrefix()+'-import', opts)
+  }
+  
+  _saveImport (req, res) {
+    let opts = this.uploadOptions()
+    opts.type = this.uploadType()
+    this.app.get('file-import').importFileToModel(this.model(), req.file.path, opts)
+      .then((insts) => {
+        req.flash('info', 'Imported '+insts.length+ ' '+pluralize(this.displayName()))
+        res.redirect(req.adminOpts.basePath+this.base())
+      })
   }
 
   _getAttrs(model, withRelated=true) {
