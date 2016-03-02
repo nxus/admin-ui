@@ -11,9 +11,6 @@ import pluralize from 'pluralize'
 import _ from 'underscore'
 import morph from 'morph'
 import Promise from 'bluebird'
-import multer from 'multer';
-
-var upload = multer({ dest: process.cwd()+'/uploads/'})
 
 /**
  * The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
@@ -44,7 +41,7 @@ export default class AdminBase extends HasModels {
       this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
     if(this.uploadType()) {
-      app.get('router').middleware(this.opts.basePath+this.base()+"/import", upload.single('file'))
+      this.app.get('data-loader').uploadPath(this.opts.basePath+this.base()+"/import", 'file')
       this.admin.adminRoute('POST', this.base()+'/import', this._saveImport.bind(this))
       this.admin.adminPage('Import '+pluralize(this.displayName()), this.base()+'/import', {nav: false}, this._import.bind(this))
       this.templater.default().template(this.templatePrefix()+'-import', 'ejs', __dirname+"/../views/import.ejs")
