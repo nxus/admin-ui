@@ -44,10 +44,9 @@ export default class AdminBase extends HasModels {
       this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
     if(this.uploadType()) {
-      // TODO AdminBase really needs access to adminOpts at all times, not via req.adminOpts middleware
-      app.get('router').middleware('/admin'+this.base()+"/import/save", upload.single('file'))
+      app.get('router').middleware(this.opts.basePath+this.base()+"/import", upload.single('file'))
+      this.admin.adminRoute('POST', this.base()+'/import', this._saveImport.bind(this))
       this.admin.adminPage('Import '+pluralize(this.displayName()), this.base()+'/import', {nav: false}, this._import.bind(this))
-      this.admin.adminRoute('POST', this.base()+'/import/save', this._saveImport.bind(this))
       this.templater.default().template(this.templatePrefix()+'-import', 'ejs', __dirname+"/../views/import.ejs")
     }
     
@@ -131,7 +130,6 @@ export default class AdminBase extends HasModels {
    * @return {array} 
    */
   modelPopulate () {
-    console.log('returning', this.opts.modelPopulate)
     return this.opts.modelPopulate || []
   }
 
@@ -171,7 +169,7 @@ export default class AdminBase extends HasModels {
     ]).spread((insts, attributes) => {
       opts = _.extend({
         req,
-        base: req.adminOpts.basePath+this.base(),
+        base: this.opts.basePath+this.base(),
         title: 'All '+this.constructor.name,
         name: this.displayName(),
         insts,
@@ -195,7 +193,7 @@ export default class AdminBase extends HasModels {
     ]).spread((inst, attributes) => {
       opts = _.extend({
         req,
-        base: req.adminOpts.basePath+this.base(),
+        base: this.opts.basePath+this.base(),
         title: 'Edit '+this.constructor.name,
         inst,
         name: this.displayName(),
@@ -216,7 +214,7 @@ export default class AdminBase extends HasModels {
     ]).spread((attributes) => {
       opts = _.extend({
         req,
-        base: req.adminOpts.basePath+this.base(),
+        base: this.opts.basePath+this.base(),
         title: 'New '+this.constructor.name,
         inst,
         name: this.displayName(),
@@ -231,7 +229,7 @@ export default class AdminBase extends HasModels {
   _remove (req, res, opts = {}) {
     return this.models[this.model()].destroy(req.params.id).then((inst) => {
       req.flash('info', this.displayName()+' deleted');
-      res.redirect(req.adminOpts.basePath+this.base())
+      res.redirect(this.opts.basePath+this.base())
     })
   }
 
@@ -245,13 +243,14 @@ export default class AdminBase extends HasModels {
       ? this.models[this.model()].update(values.id, values)
       : this.models[this.model()].create(values)
 
-    promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(req.adminOpts.basePath+this.base())})
+    promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(this.opts.basePath+this.base())})
   }
 
   _import (req, res) {
     let opts = {
-      base: req.adminOpts.basePath+this.base(),
-      name: this.displayName()
+      base: this.opts.basePath+this.base(),
+      name: this.displayName(),
+      upload: this.uploadType()
     }
     return this.templater.render(this.templatePrefix()+'-import', opts)
   }
@@ -259,10 +258,10 @@ export default class AdminBase extends HasModels {
   _saveImport (req, res) {
     let opts = this.uploadOptions()
     opts.type = this.uploadType()
-    this.app.get('file-import').importFileToModel(this.model(), req.file.path, opts)
+    this.app.get('data-loader').importFileToModel(this.model(), req.file.path, opts)
       .then((insts) => {
         req.flash('info', 'Imported '+insts.length+ ' '+pluralize(this.displayName()))
-        res.redirect(req.adminOpts.basePath+this.base())
+        res.redirect(this.opts.basePath+this.base())
       })
   }
 

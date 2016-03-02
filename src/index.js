@@ -122,16 +122,6 @@ export default class AdminUI {
       this.users.ensureAdmin(this.opts.basePath)
       this.users.ensureAdmin(this.opts.basePath+'/*')
     }
-
-    this.router.default().middleware(this.opts.basePath+"/*", (req, res, next) => {
-      req.adminOpts = this.opts;
-      next()
-    })
-
-    this.router.provideBefore('middleware', this.opts.basePath, (req, res, next) => {
-      req.adminOpts = this.opts;
-      next()
-    })
   }
 
   _addDefaultRoute() {
@@ -217,6 +207,7 @@ export default class AdminUI {
    */
   adminModel(model, opts={}) {
     var adminModel;
+    opts = _.extend({}, opts, this.opts)
     if(_.isString(model) && model.indexOf(path.sep) == -1) {
       this.app.log.debug('Loading admin model', model)
       opts.model = model
