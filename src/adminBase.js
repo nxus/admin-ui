@@ -144,15 +144,17 @@ export default class AdminBase extends HasModels {
   }
 
   /**
-   * Allow upload of models by file type
-   * @return {string}
+   * Allow upload of models by this file type
+   * @return {string} 
+   * @example return 'csv'
    */
   uploadType() {
     return this.opts.uploadType || null
   }
   /**
-   * Allow upload of models by file type
+   * Options for data-loader on upload
    * @return {string}
+   * @example return {identityFields: ['name'], mapping: {Name: 'name'}}
    */
   uploadOptions() {
     return this.opts.uploadOptions || {}
