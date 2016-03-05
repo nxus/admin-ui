@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-02-26
+* @Last Modified 2016-03-05
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -12,14 +12,28 @@
  * 
  *     > npm install @nxus/admin-ui --save
  * 
- * ## Module Configuration
+ * ## Optional Module Configuration
+ * There are two configuration options you can specify in your package.json file to change the way the admin-ui module
+ * functions. All configuration should be under the `admin-ui` section of the `config` key.
  * 
- * -   basePath: the base path, defaults to /admin
- * -   adminTemplate: the admin template to use, defaults to 'admin'
+ * -   **basePath**: the base path, defaults to /admin
+ * -   **adminTemplate**: the admin template to use, defaults to 'admin'
+ *
+ * For example:
+ *
+ * ```
+ * "config": {
+ *   "admin-ui": {
+ *     "basePath": "/otherRoute",
+ *     "adminTemplate": "myAdmin"
+ *   }
+ * }
+ * ```
  * 
  * ## Usage
  * 
- * The Admin Interface is made up of pages and routes. Pages are rendered content displayed in the Admin Interface. Routes are callbacks that don't render anything, but perform application logic (like a save handler).
+ * The Admin Interface is made up of pages and routes. Pages are rendered content displayed in the Admin Interface. 
+ * Routes are callbacks that don't render anything, but perform application logic (like a save handler).
  * 
  * ### Admin Pages
  * 
@@ -49,10 +63,10 @@
  * 
  * #### Page Configuration Options
  * 
- * -   class: string
- * -   iconClass: string
- * -   nav: boolean
- * -   order: integer
+ * -   **class**: string
+ * -   **iconClass**: string
+ * -   **nav**: boolean
+ * -   **order**: integer
  * 
  * ### Admin Routes
  * 
