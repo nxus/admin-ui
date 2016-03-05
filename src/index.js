@@ -75,6 +75,54 @@
  *     admin.adminRoute('get', '/redirect', (req, res) => {
  *       res.redirect('/admin')
  *     })
+ *
+ * ## Model View helpers
+ * 
+ * The module provides a helper for generating list/detail views from a model:
+ * 
+ *     app.get('admin-ui').adminModel('user', {base: '/users', titleField: 'email'})
+ * 
+ * You may pass in an options object, as in this example, or subclass of ViewBase, or a string path to a subclass of ViewBase.
+ * 
+ *     import {AdminBase} from '@nxus/admin-ui'
+ * 
+ *     class UserView extends AdminBase {
+ *       model() {
+ *         return 'user'
+ *       }
+ *       base() {
+ *         return '/users'
+ *       }
+ *       titleField() {
+ *         return 'email
+ *       }
+ *     }
+ * 
+ *     app.get('admin-ui').adminModel(UserView)
+ *     
+ * ### Customizing
+ * 
+ * If you want to provide your own 404 or 500 page, define the relevant new template. Base-ui will use these to handle the routes above.
+ * 
+ * #### List and Detail View
+ *
+ * You can specify your own list view template to use instead of the default. The base-ui module looks for a template matching the following 
+ * pattern: `admin-<model>-list` and `admin-<model>-detail`.
+ *
+ * Each template will be passed either a model instance (for detail view) or an array of models (for list view), using the model name.
+ *
+ * So using the examples above:
+ *
+ * ```
+ * app.get('templater').template('admin-user-list', 'ejs', () => {
+ *   return "<% users.forEach(function(user){ .... }) %>"
+ * })
+ * 
+ * app.get('templater').template('admin-user-detail', 'ejs', () => {
+ *   return "<%= user.email %>"
+ * })
+ * ```
+ *  
  * 
  * # API
  * -----
