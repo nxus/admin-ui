@@ -10,14 +10,27 @@ An Admin UI Framework for Nxus Apps.
 
     > npm install @nxus/admin-ui --save
 
-### Module Configuration
+### Optional Module Configuration
 
--   basePath: the base path, defaults to /admin
--   adminTemplate: the admin template to use, defaults to 'admin'
+There are two configuration options you can specify in your package.json file to change the way the admin-ui module
+functions. All configuration should be under the `admin-ui` section of the `config` key.
+
+-   **basePath**: the base path, defaults to /admin
+-   **adminTemplate**: the admin template to use, defaults to 'admin'
+
+For example:
+
+    "config": {
+      "admin-ui": {
+        "basePath": "/otherRoute",
+        "adminTemplate": "myAdmin"
+      }
+    }
 
 ### Usage
 
-The Admin Interface is made up of pages and routes. Pages are rendered content displayed in the Admin Interface. Routes are callbacks that don't render anything, but perform application logic (like a save handler).
+The Admin Interface is made up of pages and routes. Pages are rendered content displayed in the Admin Interface. 
+Routes are callbacks that don't render anything, but perform application logic (like a save handler).
 
 #### Admin Pages
 
@@ -47,10 +60,10 @@ If you provide a callback, the return should either a string or a Promise for a 
 
 ##### Page Configuration Options
 
--   class: string
--   iconClass: string
--   nav: boolean
--   order: integer
+-   **class**: string
+-   **iconClass**: string
+-   **nav**: boolean
+-   **order**: integer
 
 #### Admin Routes
 
@@ -58,6 +71,51 @@ If you provide a callback, the return should either a string or a Promise for a 
 
     admin.adminRoute('get', '/redirect', (req, res) => {
       res.redirect('/admin')
+    })
+
+### Model View helpers
+
+The module provides a helper for generating list/detail views from a model:
+
+    app.get('admin-ui').adminModel('user', {base: '/users', titleField: 'email'})
+
+You may pass in an options object, as in this example, or subclass of ViewBase, or a string path to a subclass of ViewBase.
+
+    import {AdminBase} from '@nxus/admin-ui'
+
+    class UserView extends AdminBase {
+      model() {
+        return 'user'
+      }
+      base() {
+        return '/users'
+      }
+      titleField() {
+        return 'email
+      }
+    }
+
+    app.get('admin-ui').adminModel(UserView)
+
+#### Customizing
+
+If you want to provide your own 404 or 500 page, define the relevant new template. Base-ui will use these to handle the routes above.
+
+##### List and Detail View
+
+You can specify your own list view template to use instead of the default. The base-ui module looks for a template matching the following 
+pattern: `admin-<model>-list` and `admin-<model>-detail`.
+
+Each template will be passed either a model instance (for detail view) or an array of models (for list view), using the model name.
+
+So using the examples above:
+
+    app.get('templater').template('admin-user-list', 'ejs', () => {
+      return "<% users.forEach(function(user){ .... }) %>"
+    })
+
+    app.get('templater').template('admin-user-detail', 'ejs', () => {
+      return "<%= user.email %>"
     })
 
 ## API
@@ -120,6 +178,12 @@ Define the primary model for this admin module
 
 Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
+### modelNames
+
+Returns a hash of currently used models.
+
+Returns **\[type]** [description]
+
 ### modelPopulate
 
 Define any populated relationships for the model
@@ -135,6 +199,30 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 ### templatePrefix
 
 The prefix to use for the templates. Defaults to `admin-<model>-`
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### uploadOptions
+
+Options for data-loader on upload
+
+**Examples**
+
+```javascript
+return {identityFields: ['name'], mapping: {Name: 'name'}}
+```
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### uploadType
+
+Allow upload of models by this file type
+
+**Examples**
+
+```javascript
+return 'csv'
+```
 
 Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
