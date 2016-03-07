@@ -184,16 +184,6 @@ export default class AdminUI {
       this.users.ensureAdmin(this.opts.basePath)
       this.users.ensureAdmin(this.opts.basePath+'/*')
     }
-
-    this.router.default().middleware(this.opts.basePath+"/*", (req, res, next) => {
-      req.adminOpts = this.opts;
-      next()
-    })
-
-    this.router.provideBefore('middleware', this.opts.basePath, (req, res, next) => {
-      req.adminOpts = this.opts;
-      next()
-    })
   }
 
   _addDefaultRoute() {
@@ -279,6 +269,7 @@ export default class AdminUI {
    */
   adminModel(model, opts={}) {
     var adminModel;
+    opts = _.extend({}, opts, this.opts)
     if(_.isString(model) && model.indexOf(path.sep) == -1) {
       this.app.log.debug('Loading admin model', model)
       opts.model = model
@@ -304,10 +295,7 @@ export default class AdminUI {
     let nav = this._getNav();
     
     if(typeof handler == 'string') {
-      if(fs.existsSync(handler)) {
-        return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config, req}).then(res.send.bind(res));
-      }
-      return this.templater.render(this.opts.adminTemplate, {title, nav, content: handler, opts: this.app.config, req}).then(res.send.bind(res));
+      return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config, req}).then(res.send.bind(res));
     } else {
       return Promise.try(() => { return handler(req, res)}).then((content) => {
         return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config, req}).then(res.send.bind(res))

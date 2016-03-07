@@ -1,4 +1,7 @@
 <a class="btn btn-primary" href="<%= base %>/create"><i class="fa fa-plus"></i> Add <%= name %></a>
+<% if (upload) { %>
+<a class="btn btn-primary" href="<%= base %>/import"><i class="fa fa-plus"></i> Import <%= name %></a>
+<% } %>
 <table class="table table-stripped">
     <thead>
         <tr>

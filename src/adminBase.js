@@ -40,6 +40,13 @@ export default class AdminBase extends HasModels {
     if(this.templateDir())
       this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
 
+    if(this.uploadType()) {
+      this.app.get('data-loader').uploadPath(this.opts.basePath+this.base()+"/import", 'file')
+      this.admin.adminRoute('POST', this.base()+'/import', this._saveImport.bind(this))
+      this.admin.adminPage('Import '+pluralize(this.displayName()), this.base()+'/import', {nav: false}, this._import.bind(this))
+      this.templater.default().template(this.templatePrefix()+'-import', 'ejs', __dirname+"/../views/import.ejs")
+    }
+    
     this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this._list.bind(this))
     this.admin.adminPage('New '+this.displayName(), this.base()+'/create', {nav: false}, this._create.bind(this))
     this.admin.adminPage('Edit '+this.displayName(), this.base()+'/edit/:id', {nav: false}, this._edit.bind(this)) 
@@ -120,7 +127,6 @@ export default class AdminBase extends HasModels {
    * @return {array} 
    */
   modelPopulate () {
-    console.log('returning', this.opts.modelPopulate)
     return this.opts.modelPopulate || []
   }
 
@@ -132,6 +138,23 @@ export default class AdminBase extends HasModels {
     let ret = {}
     ret[this.model()] = this.model()
     return ret;
+  }
+
+  /**
+   * Allow upload of models by this file type
+   * @return {string} 
+   * @example return 'csv'
+   */
+  uploadType() {
+    return this.opts.uploadType || null
+  }
+  /**
+   * Options for data-loader on upload
+   * @return {string}
+   * @example return {identityFields: ['name'], mapping: {Name: 'name'}}
+   */
+  uploadOptions() {
+    return this.opts.uploadOptions || {}
   }
   
   _list (req, res, opts = {}) {
@@ -145,11 +168,12 @@ export default class AdminBase extends HasModels {
     ]).spread((insts, attributes) => {
       opts = _.extend({
         req,
-        base: req.adminOpts.basePath+this.base(),
+        base: this.opts.basePath+this.base(),
         title: 'All '+this.constructor.name,
         name: this.displayName(),
         insts,
-        attributes: attributes
+        attributes: attributes,
+        upload: this.uploadType()
       }, opts)
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
@@ -168,7 +192,7 @@ export default class AdminBase extends HasModels {
     ]).spread((inst, attributes) => {
       opts = _.extend({
         req,
-        base: req.adminOpts.basePath+this.base(),
+        base: this.opts.basePath+this.base(),
         title: 'Edit '+this.constructor.name,
         inst,
         name: this.displayName(),
@@ -189,7 +213,7 @@ export default class AdminBase extends HasModels {
     ]).spread((attributes) => {
       opts = _.extend({
         req,
-        base: req.adminOpts.basePath+this.base(),
+        base: this.opts.basePath+this.base(),
         title: 'New '+this.constructor.name,
         inst,
         name: this.displayName(),
@@ -204,7 +228,7 @@ export default class AdminBase extends HasModels {
   _remove (req, res, opts = {}) {
     return this.models[this.model()].destroy(req.params.id).then((inst) => {
       req.flash('info', this.displayName()+' deleted');
-      res.redirect(req.adminOpts.basePath+this.base())
+      res.redirect(this.opts.basePath+this.base())
     })
   }
 
@@ -218,7 +242,26 @@ export default class AdminBase extends HasModels {
       ? this.models[this.model()].update(values.id, values)
       : this.models[this.model()].create(values)
 
-    promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(req.adminOpts.basePath+this.base())})
+    promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(this.opts.basePath+this.base())})
+  }
+
+  _import (req, res) {
+    let opts = {
+      base: this.opts.basePath+this.base(),
+      name: this.displayName(),
+      upload: this.uploadType()
+    }
+    return this.templater.render(this.templatePrefix()+'-import', opts)
+  }
+  
+  _saveImport (req, res) {
+    let opts = this.uploadOptions()
+    opts.type = this.uploadType()
+    this.app.get('data-loader').importFileToModel(this.model(), req.file.path, opts)
+      .then((insts) => {
+        req.flash('info', 'Imported '+insts.length+ ' '+pluralize(this.displayName()))
+        res.redirect(this.opts.basePath+this.base())
+      })
   }
 
   _getAttrs(model, withRelated=true) {

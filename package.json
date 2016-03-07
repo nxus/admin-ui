@@ -28,6 +28,7 @@
   "homepage": "https://github.com/nxus/admin-ui#readme",
   "peerDependencies": {
     "@nxus/core": "^2.4.0-0",
+    "@nxus/data-loader": "^2.4.0-0",
     "@nxus/renderer": "^2.4.0-0",
     "@nxus/templater": "^2.4.0-0",
     "@nxus/router": "^2.4.0-0",
