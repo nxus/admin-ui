@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-03-05
+* @Last Modified 2016-03-18
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -278,11 +278,11 @@ export default class AdminUI {
       if(fs.existsSync(model)) {
         this.app.log.debug('Loading admin model file at', model)
         model = require(model);
-        adminModel = new model(this.app)
+        adminModel = new model(this.app, opts)
       } else
         throw new Error('Class path '+model+' is not a valid file')
     } else if(_.isFunction(model)) {
-      adminModel = new model(this.app)
+      adminModel = new model(this.app, opts)
     }
   }
 
@@ -295,10 +295,10 @@ export default class AdminUI {
     let nav = this._getNav();
     
     if(typeof handler == 'string') {
-      return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config, req}).then(res.send.bind(res));
+      return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res));
     } else {
       return Promise.try(() => { return handler(req, res)}).then((content) => {
-        return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config, req}).then(res.send.bind(res))
+        return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res))
       }).catch((e) => {
         console.log('Caught error rendering admin handler', e, e.stack)
       })
