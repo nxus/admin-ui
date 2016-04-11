@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-26
+* @Last Modified 2016-04-11
 */
 
 'use strict';
@@ -238,11 +238,18 @@ export default class AdminBase extends HasModels {
       values = req.body
     else
       values = opts[this.model()]
+
+    let attrs = this._getAttrs(this.models[this.model()], false)
+
+    attrs.forEach((attr) => {
+      if(attr.type == 'boolean') values[attr.name] = (typeof values[attr.name] != 'undefined')
+    })
+
     let promise = values.id
       ? this.models[this.model()].update(values.id, values)
       : this.models[this.model()].create(values)
 
-    promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(this.opts.basePath+this.base())})
+    promise.then((u) => {req.flash('info', this.displayName()+' saved'); res.redirect(this.opts.basePath+this.base())})
   }
 
   _import (req, res) {
@@ -275,6 +282,10 @@ export default class AdminBase extends HasModels {
       let ret = model._attributes[k]
       ret.name = k
       if(!ret.label) ret.label = this._sanitizeName(k)
+      if(ret.enum) {
+        ret.type = 'enum'
+        ret.opts = ret.enum
+      }
       if(ret.model) {
         ret.type = 'related'
         related.push(ret)
