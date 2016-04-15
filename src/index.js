@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-04-08
+* @Last Modified 2016-04-14
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -295,7 +295,7 @@ export default class AdminUI {
     let nav = this._getNav();
     
     if(typeof handler == 'string') {
-      return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res));
+      return this.templater.render(this.opts.adminTemplate, {content: handler, title, nav, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res));
     } else {
       return Promise.try(() => { return handler(req, res)}).then((content) => {
         if(!content) return

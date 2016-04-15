@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-04-11
+* @Last Modified 2016-04-14
 */
 
 'use strict';
@@ -36,9 +36,10 @@ export default class AdminBase extends HasModels {
     this.opts = opts
     this.admin = app.get('admin-ui')
     this.templater = app.get('templater')
+    this.renderer = app.get('renderer')
     
     if(this.templateDir())
-      this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
+      this.templater.templateDir(this.templateDir())
 
     if(this.uploadType()) {
       this.app.get('data-loader').uploadPath(this.opts.basePath+this.base()+"/import", 'file')
@@ -53,8 +54,13 @@ export default class AdminBase extends HasModels {
     this.admin.adminRoute('get', this.base()+'/remove/:id', this._remove.bind(this))
     this.admin.adminRoute('post', this.base()+'/save', this._save.bind(this))
 
-    this.templater.default().template(this.templatePrefix()+'-list', 'ejs', __dirname+"/../views/list.ejs")
-    this.templater.default().template(this.templatePrefix()+'-form', 'ejs', __dirname+"/../views/form.ejs")
+    this.templater.default().templateFunction(this.templatePrefix()+'-list', (opts) => {
+      return this.renderer.renderFile(__dirname+"/../views/list.ejs", opts)
+    }) 
+
+    this.templater.default().templateFunction(this.templatePrefix()+'-form', (opts) => {
+      return this.renderer.renderFile(__dirname+"/../views/form.ejs", opts)
+    })
   }
 
   /**
@@ -178,7 +184,7 @@ export default class AdminBase extends HasModels {
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
       return this.templater.render(this.templatePrefix()+'-list', opts);
-    }).catch((e) => {console.log('caught on find', e)})
+    }).catch((e) => {this.app.log.error(e)})
   }
 
   _edit (req, res, opts = {}) {
