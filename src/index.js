@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-04-14
+* @Last Modified 2016-04-15
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -114,12 +114,12 @@
  * So using the examples above:
  *
  * ```
- * app.get('templater').template('admin-user-list', 'ejs', () => {
- *   return "<% users.forEach(function(user){ .... }) %>"
+ * app.get('templater').templateFunction('admin-user-list', (opts) => {
+ *   return app.get('renderer').render("ejs", "<% users.forEach(function(user){ .... }) %>", opts)
  * })
  * 
  * app.get('templater').template('admin-user-detail', 'ejs', () => {
- *   return "<%= user.email %>"
+ *   return app.get('renderer').render("ejs", "Email: <%= user.email %>", opts)
  * })
  * ```
  *  
