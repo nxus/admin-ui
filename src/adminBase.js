@@ -40,11 +40,14 @@ export default class AdminBase extends HasModels {
     if(this.templateDir())
       this.templater.templateDir(this.templateDir())
 
+    this.admin.modelAction(this.model(), 'Add', 'create', {iconClass:"fa fa-plus", suffixName: true})
+
     if(this.uploadType()) {
       this.app.get('data-loader').uploadPath(this.opts.basePath+this.base()+"/import", 'file')
       this.admin.adminRoute('POST', this.base()+'/import', this._saveImport.bind(this))
       this.admin.adminPage('Import '+pluralize(this.displayName()), this.base()+'/import', {nav: false}, this._import.bind(this))
       this.templater.default().template(__dirname+"/../views/import.ejs", null, this.templatePrefix()+'-import')
+      this.admin.modelAction(this.model(), 'Import', 'import', {iconClass:"fa fa-plus", suffixName: true})
     }
     
     this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this._list.bind(this))
@@ -55,6 +58,7 @@ export default class AdminBase extends HasModels {
 
     this.templater.default().template(__dirname+"/../views/list.ejs", null, this.templatePrefix()+'-list')
     this.templater.default().template(__dirname+"/../views/form.ejs", null, this.templatePrefix()+'-form')
+    
   }
 
   /**
@@ -164,8 +168,9 @@ export default class AdminBase extends HasModels {
     }
     return Promise.all([
       find,
-      this._getAttrs(this.models[this.model()], false)
-    ]).spread((insts, attributes) => {
+      this._getAttrs(this.models[this.model()], false),
+      this.admin.getModelActions(this.model())
+    ]).spread((insts, attributes, actions) => {
       opts = _.extend({
         req,
         base: this.opts.basePath+this.base(),
@@ -173,7 +178,8 @@ export default class AdminBase extends HasModels {
         name: this.displayName(),
         insts,
         attributes: attributes,
-        upload: this.uploadType()
+        upload: this.uploadType(),
+        actions
       }, opts)
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
@@ -188,15 +194,17 @@ export default class AdminBase extends HasModels {
     }
     return Promise.all([
       find,
-      this._getAttrs(this.models[this.model()])
-    ]).spread((inst, attributes) => {
+      this._getAttrs(this.models[this.model()]),
+      this.admin.getInstanceActions(this.model())
+    ]).spread((inst, attributes, actions) => {
       opts = _.extend({
         req,
         base: this.opts.basePath+this.base(),
         title: 'Edit '+this.constructor.name,
         inst,
         name: this.displayName(),
-        attributes: attributes
+        attributes: attributes,
+        actions
       }, opts)
       if(!opts[this.model()]) opts[this.model()] = inst
       else opts.inst = opts[this.model()]

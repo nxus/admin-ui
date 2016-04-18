@@ -1,3 +1,9 @@
+<% if (inst.id && actions) { %>
+  <% actions.forEach(function(action) { %>
+    <a class="btn btn-primary" href="<%= base %>/<%= action.subURL %>"><i class="<%= action.iconClass %>"></i> <%= action.label %><%if (action.suffixName) { %> <%=name%><%}%></a>
+  <% }) %>
+<% } %>
+
 <form role="form" action="<%= base %>/save" method="POST" class="form-horizontal form-bordered" id="validateForm">
     <input type="hidden" id="id" name="id" value="<%= inst.id %>" />
     <div class="form-body">

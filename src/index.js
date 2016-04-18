@@ -159,6 +159,8 @@ export default class AdminUI {
     this.app = app
     this.pages = {}
     this.nav = []
+    this.modelActions = {'*': []}
+    this.instanceActions = {'*': []}
     this.opts = Object.assign(defaultOpts, this.app.config.adminUI)
 
     this.users = this.app.get('users')
@@ -170,6 +172,10 @@ export default class AdminUI {
       .gather('adminPage')
       .gather('adminRoute')
       .gather('adminModel')
+      .gather('modelAction')
+      .gather('instanceAction')
+      .respond('getModelActions')
+      .respond('getInstanceActions')
 
     this._setupRoutes()
 
@@ -194,6 +200,52 @@ export default class AdminUI {
   }
 
   /**
+   * Register an action for the model list page
+   * @param {String} model The model identity to include this action, or '*'
+   * @param {String} label The button label for this action
+   * @param {String} subURL The url for this action (register this as an adminPage separately)
+   * @param {object} opts  Additional options: class, iconClass, suffixName
+   */
+  modelAction(model, label, subURL, opts) {
+    if (this.modelActions[model] === undefined) {
+      this.modelActions[model] = []
+    }
+    let action = Object.assign({label, subURL}, opts)
+    this.modelActions[model].push(action)
+  }
+
+  /**
+   * Register an action for the model detail page
+   * @param {String} model The model identity to include this action, or '*'
+   * @param {String} label The button label for this action
+   * @param {String} subURL The url for this action (register this as an adminPage separately)
+   * @param {object} opts  Additional options: class, iconClass, suffixName
+   */
+  instanceAction(model, label, subURL, opts) {
+    if (this.instanceActions[model] === undefined) {
+      this.instanceActions[model] = []
+    }
+    let action = Object.assign({label, subURL}, opts)
+    this.instanceActions[model].push(action)
+  }
+
+  /**
+   * Get the registered actions for model
+   * @param {String} model The model identity
+   */
+  getModelActions(model) {
+    return [].concat(this.modelActions['*'], this.modelActions[model])
+  }
+
+  /**
+   * Get the registered actions for model instances
+   * @param {String} model The model identity
+   */
+  getInstanceActions(model) {
+    return [].concat(this.instanceActions['*'], this.instanceActions[model])
+  }
+  
+  /**
    * Register a page for inclusion in the admin site and navigation 
    *  Page template will receive (and can set in opts):
    *   - class: string
@@ -204,7 +256,6 @@ export default class AdminUI {
    * @param {String} path  The url path for the page
    * @param {object} opts  Additional options for the rendering of this page
    * @param {string|template-partial|function} handler for rendering this page
-   * @e
    */
   adminPage(title, path, opts, handler) {
     if(!handler) {
