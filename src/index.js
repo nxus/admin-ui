@@ -114,11 +114,11 @@
  * So using the examples above:
  *
  * ```
- * app.get('templater').template('admin-user-list', 'ejs', () => {
+ * app.get('templater').templateFunction('admin-user-list', 'admin', () => {
  *   return "<% users.forEach(function(user){ .... }) %>"
  * })
  * 
- * app.get('templater').template('admin-user-detail', 'ejs', () => {
+ * app.get('templater').templateFunction('admin-user-detail', 'admin', () => {
  *   return "<%= user.email %>"
  * })
  * ```
@@ -295,7 +295,7 @@ export default class AdminUI {
     let nav = this._getNav();
     
     if(typeof handler == 'string') {
-      return this.templater.renderPartial(handler, this.opts.adminTemplate, {title, nav, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res));
+      return this.templater.render(handler, {title, nav, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res));
     } else {
       return Promise.try(() => { return handler(req, res)}).then((content) => {
         return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res))

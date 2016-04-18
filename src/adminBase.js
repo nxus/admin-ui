@@ -38,13 +38,13 @@ export default class AdminBase extends HasModels {
     this.templater = app.get('templater')
     
     if(this.templateDir())
-      this.templater.templateDir('ejs', this.templateDir(), this.templatePrefix())
+      this.templater.templateDir(this.templateDir())
 
     if(this.uploadType()) {
       this.app.get('data-loader').uploadPath(this.opts.basePath+this.base()+"/import", 'file')
       this.admin.adminRoute('POST', this.base()+'/import', this._saveImport.bind(this))
       this.admin.adminPage('Import '+pluralize(this.displayName()), this.base()+'/import', {nav: false}, this._import.bind(this))
-      this.templater.default().template(this.templatePrefix()+'-import', 'ejs', __dirname+"/../views/import.ejs")
+      this.templater.default().template(__dirname+"/../views/import.ejs", null, this.templatePrefix()+'-import')
     }
     
     this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this._list.bind(this))
@@ -53,8 +53,8 @@ export default class AdminBase extends HasModels {
     this.admin.adminRoute('get', this.base()+'/remove/:id', this._remove.bind(this))
     this.admin.adminRoute('post', this.base()+'/save', this._save.bind(this))
 
-    this.templater.default().template(this.templatePrefix()+'-list', 'ejs', __dirname+"/../views/list.ejs")
-    this.templater.default().template(this.templatePrefix()+'-form', 'ejs', __dirname+"/../views/form.ejs")
+    this.templater.default().template(__dirname+"/../views/list.ejs", null, this.templatePrefix()+'-list')
+    this.templater.default().template(__dirname+"/../views/form.ejs", null, this.templatePrefix()+'-form')
   }
 
   /**
