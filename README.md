@@ -303,3 +303,41 @@ Register a raw route for inclusion in the admin site
 -   `method` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The HTTP method to handle
 -   `path` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The url path for the page
 -   `handler` **[function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** for rendering this page
+
+### getInstanceActions
+
+Get the registered actions for model instances
+
+**Parameters**
+
+-   `model` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The model identity
+
+### getModelActions
+
+Get the registered actions for model
+
+**Parameters**
+
+-   `model` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The model identity
+
+### instanceAction
+
+Register an action for the model detail page
+
+**Parameters**
+
+-   `model` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The model identity to include this action, or '\*'
+-   `label` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The button label for this action
+-   `subURL` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The url for this action (register this as an adminPage separately)
+-   `opts` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Additional options: class, iconClass, suffixName
+
+### modelAction
+
+Register an action for the model list page
+
+**Parameters**
+
+-   `model` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The model identity to include this action, or '\*'
+-   `label` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The button label for this action
+-   `subURL` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The url for this action (register this as an adminPage separately)
+-   `opts` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Additional options: class, iconClass, suffixName
