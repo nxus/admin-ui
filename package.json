@@ -1,6 +1,6 @@
 {
   "name": "@nxus/admin-ui",
-  "version": "2.4.0-7",
+  "version": "2.4.0-8",
   "description": "An Admin UI Framework for Nxus Apps",
   "main": "lib",
   "scripts": {
@@ -28,9 +28,9 @@
   "homepage": "https://github.com/nxus/admin-ui#readme",
   "peerDependencies": {
     "@nxus/core": "^2.4.0-0",
-    "@nxus/data-loader": "^2.4.0-0",
+    "@nxus/data-loader": "^2.4.0-3",
     "@nxus/renderer": "^2.4.0-0",
-    "@nxus/templater": "^2.4.0-0",
+    "@nxus/templater": "^2.4.0-5",
     "@nxus/router": "^2.4.0-0",
     "@nxus/storage": "^2.4.0-0",
     "@nxus/base-ui": "^2.4.0-0"

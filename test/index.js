@@ -28,6 +28,8 @@ describe("AdminUI", () => {
     it("should gather events", () => {
       app.get('admin-ui').gather.calledWith('adminPage')
       app.get('admin-ui').gather.calledWith('adminRoute')
+      app.get('admin-ui').gather.calledWith('modelAction')
+      app.get('admin-ui').gather.calledWith('instanceAction')
     });
     
     it("should have protected routes", () => {

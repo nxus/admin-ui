@@ -1,7 +1,9 @@
-<a class="btn btn-primary" href="<%= base %>/create"><i class="fa fa-plus"></i> Add <%= name %></a>
-<% if (upload) { %>
-<a class="btn btn-primary" href="<%= base %>/import"><i class="fa fa-plus"></i> Import <%= name %></a>
+<% if (actions) { %>
+  <% actions.forEach(function(action) { %>
+    <a class="btn btn-primary" href="<%= base %>/<%= action.subURL %>"><i class="<%= action.iconClass %>"></i> <%= action.label %><%if (action.suffixName) { %> <%=name%><%}%></a>
+  <% }) %>
 <% } %>
+
 <table class="table table-stripped">
     <thead>
         <tr>
