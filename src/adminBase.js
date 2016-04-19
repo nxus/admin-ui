@@ -174,7 +174,7 @@ export default class AdminBase extends HasModels {
       opts = _.extend({
         req,
         base: this.opts.basePath+this.base(),
-        title: 'All '+this.constructor.name,
+        title: 'All '+pluralize(this.displayName()),
         name: this.displayName(),
         insts,
         attributes: attributes,
@@ -200,7 +200,7 @@ export default class AdminBase extends HasModels {
       opts = _.extend({
         req,
         base: this.opts.basePath+this.base(),
-        title: 'Edit '+this.constructor.name,
+        title: 'Edit '+this.displayName(),
         inst,
         name: this.displayName(),
         attributes: attributes,
@@ -222,7 +222,7 @@ export default class AdminBase extends HasModels {
       opts = _.extend({
         req,
         base: this.opts.basePath+this.base(),
-        title: 'New '+this.constructor.name,
+        title: 'New '+this.displayName(),
         inst,
         name: this.displayName(),
         attributes: attributes
