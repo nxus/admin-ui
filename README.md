@@ -110,12 +110,12 @@ Each template will be passed either a model instance (for detail view) or an arr
 
 So using the examples above:
 
-    app.get('templater').template('admin-user-list', 'ejs', () => {
-      return "<% users.forEach(function(user){ .... }) %>"
+    app.get('templater').templateFunction('admin-user-list', (opts) => {
+      return app.get('renderer').render("ejs", "<% users.forEach(function(user){ .... }) %>", opts)
     })
 
     app.get('templater').template('admin-user-detail', 'ejs', () => {
-      return "<%= user.email %>"
+      return app.get('renderer').render("ejs", "Email: <%= user.email %>", opts)
     })
 
 ## API

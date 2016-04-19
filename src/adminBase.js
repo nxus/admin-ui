@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-02-26
+* @Last Modified 2016-04-14
 */
 
 'use strict';
@@ -36,6 +36,7 @@ export default class AdminBase extends HasModels {
     this.opts = opts
     this.admin = app.get('admin-ui')
     this.templater = app.get('templater')
+    this.renderer = app.get('renderer')
     
     if(this.templateDir())
       this.templater.templateDir(this.templateDir())
@@ -184,7 +185,7 @@ export default class AdminBase extends HasModels {
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
       return {template: this.templatePrefix()+'-list', opts}
-    }).catch((e) => {console.log('caught on find', e)})
+    }).catch((e) => {this.app.log.error(e)})
   }
 
   _edit (req, res, opts = {}) {
@@ -246,11 +247,18 @@ export default class AdminBase extends HasModels {
       values = req.body
     else
       values = opts[this.model()]
+
+    let attrs = this._getAttrs(this.models[this.model()], false)
+
+    attrs.forEach((attr) => {
+      if(attr.type == 'boolean') values[attr.name] = (typeof values[attr.name] != 'undefined')
+    })
+
     let promise = values.id
       ? this.models[this.model()].update(values.id, values)
       : this.models[this.model()].create(values)
 
-    promise.then((u) => {req.flash('info', this.displayName()+' created'); res.redirect(this.opts.basePath+this.base())})
+    promise.then((u) => {req.flash('info', this.displayName()+' saved'); res.redirect(this.opts.basePath+this.base())})
   }
 
   _import (req, res) {
@@ -283,6 +291,10 @@ export default class AdminBase extends HasModels {
       let ret = model._attributes[k]
       ret.name = k
       if(!ret.label) ret.label = this._sanitizeName(k)
+      if(ret.enum) {
+        ret.type = 'enum'
+        ret.opts = ret.enum
+      }
       if(ret.model) {
         ret.type = 'related'
         related.push(ret)

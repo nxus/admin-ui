@@ -13,9 +13,12 @@
     <input type="hidden" id="id" name="id" value="<%= inst.id %>" />
     <div class="form-body">
       <% attributes.forEach(function(attr) { %>
-        <% attr.value = inst[attr.name] %>
-        <%- include("inputs/"+attr.type+".ejs", attr) %>
+        <% if(typeof attr.type != 'undefined') { %>
+            <% attr.value = inst[attr.name] %>
+            <%- include("inputs/"+attr.type+".ejs", attr) %>
+        <% } %>
       <% }) %>
+
     </div>
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-7">
