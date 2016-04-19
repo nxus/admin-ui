@@ -349,6 +349,7 @@ export default class AdminUI {
       return this.templater.render(handler, {title, nav, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res));
     } else {
       return Promise.try(() => { return handler(req, res)}).then((content) => {
+        if (!content) return
         let opts = {
           title,
           nav,
