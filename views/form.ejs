@@ -1,7 +1,12 @@
 <% if (inst.id && actions) { %>
+<div class="row">
+  <div class="col-md-12">
   <% actions.forEach(function(action) { %>
-    <a class="btn btn-primary" href="<%= base %>/<%= action.subURL %>"><i class="<%= action.iconClass %>"></i> <%= action.label %><%if (action.suffixName) { %> <%=name%><%}%></a>
+    <a class="btn btn-primary" href="<%= base %>/<%=inst.id%>/<%= action.subURL %>"><i class="<%= action.iconClass %>"></i> <%= action.label %><%if (action.suffixName) { %> <%=name%><%}%></a>
   <% }) %>
+  <hr />
+  </div>
+</div>
 <% } %>
 
 <form role="form" action="<%= base %>/save" method="POST" class="form-horizontal form-bordered" id="validateForm">

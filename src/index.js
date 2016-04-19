@@ -349,7 +349,22 @@ export default class AdminUI {
       return this.templater.render(handler, {title, nav, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res));
     } else {
       return Promise.try(() => { return handler(req, res)}).then((content) => {
-        return this.templater.render(this.opts.adminTemplate, {title, nav, content, opts: this.app.config, base: this.opts.basePath, req}).then(res.send.bind(res))
+        let opts = {
+          title,
+          nav,
+          content,
+          opts: this.app.config,
+          base: this.opts.basePath,
+          req
+        }
+        let template = this.opts.adminTemplate
+        if (content.template) {
+          opts.template = this.opts.adminTemplate
+          template = content.template
+          opts = Object.assign(opts, content.opts)
+        }
+        return this.templater.render(template, opts).then(res.send.bind(res))
+        
       }).catch((e) => {
         console.log('Caught error rendering admin handler', e, e.stack)
       })

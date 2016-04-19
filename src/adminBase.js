@@ -183,7 +183,7 @@ export default class AdminBase extends HasModels {
       }, opts)
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
-      return this.templater.render(this.templatePrefix()+'-list', opts);
+      return {template: this.templatePrefix()+'-list', opts}
     }).catch((e) => {console.log('caught on find', e)})
   }
 
@@ -208,7 +208,7 @@ export default class AdminBase extends HasModels {
       }, opts)
       if(!opts[this.model()]) opts[this.model()] = inst
       else opts.inst = opts[this.model()]
-      return this.templater.render(this.templatePrefix()+'-form', opts)
+      return {template: this.templatePrefix()+'-form', opts}
     })
   }
 
@@ -229,7 +229,7 @@ export default class AdminBase extends HasModels {
       }, opts)
       if(!opts[this.model()]) opts[this.model()] = inst
       else opts.inst = opts[this.model()]
-      return this.templater.render(this.templatePrefix()+'-form', opts)
+      return {template: this.templatePrefix()+'-form', opts}
     })      
   }
 
