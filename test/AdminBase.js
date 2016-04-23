@@ -44,8 +44,8 @@ describe("AdminBase", () => {
     it("should have routes", () => {
       app.get('admin-ui').provide.calledWith('adminPage', 'Test Models', '/test').should.be.true;
       app.get('admin-ui').provide.calledWith('adminPage', 'New Test Model', '/test/create').should.be.true;
-      app.get('admin-ui').provide.calledWith('adminPage', 'Edit Test Model', '/test/edit/:id').should.be.true;
-      app.get('admin-ui').provide.calledWith('adminRoute', 'get', '/test/remove/:id').should.be.true;
+      app.get('admin-ui').provide.calledWith('adminPage', 'Edit Test Model', '/test/:id/edit').should.be.true;
+      app.get('admin-ui').provide.calledWith('adminRoute', 'get', '/test/:id/remove').should.be.true;
       app.get('admin-ui').provide.calledWith('adminRoute', 'post', '/test/save').should.be.true;
     });
     
