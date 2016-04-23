@@ -256,7 +256,11 @@ export default class AdminBase extends HasModels {
 
     attrs.forEach((attr) => {
       if(attr.type == 'boolean') values[attr.name] = (typeof values[attr.name] != 'undefined')
-      if(attr.type == 'json' || attr.type == 'mixed') values[attr.name] = JSON.parse(values[attr.name])
+      try {
+        if(attr.type == 'json' || attr.type == 'mixed') values[attr.name] = JSON.parse(values[attr.name])
+      } catch (e) {
+        delete values[attr.name]
+      }
     })
 
     let promise = values.id
