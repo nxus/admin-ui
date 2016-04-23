@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-04-15
+* @Last Modified 2016-04-23
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -207,7 +207,7 @@ export default class AdminUI {
    * @param {object} opts  Additional options: class, iconClass, suffixName
    */
   modelAction(model, label, subURL, opts) {
-    if (this.modelActions[model] === undefined) {
+    if (!this.modelActions[model]) {
       this.modelActions[model] = []
     }
     let action = Object.assign({label, subURL}, opts)
@@ -222,7 +222,7 @@ export default class AdminUI {
    * @param {object} opts  Additional options: class, iconClass, suffixName
    */
   instanceAction(model, label, subURL, opts) {
-    if (this.instanceActions[model] === undefined) {
+    if (!this.instanceActions[model]) {
       this.instanceActions[model] = []
     }
     let action = Object.assign({label, subURL}, opts)
@@ -234,7 +234,7 @@ export default class AdminUI {
    * @param {String} model The model identity
    */
   getModelActions(model) {
-    return [].concat(this.modelActions['*'], this.modelActions[model])
+    return _.compact([].concat(this.modelActions['*'], this.modelActions[model]))
   }
 
   /**
@@ -242,7 +242,7 @@ export default class AdminUI {
    * @param {String} model The model identity
    */
   getInstanceActions(model) {
-    return [].concat(this.instanceActions['*'], this.instanceActions[model])
+    return _.compact([].concat(this.instanceActions['*'], this.instanceActions[model]))
   }
   
   /**

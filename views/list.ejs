@@ -26,8 +26,11 @@
             <td><%= u[attr.name] %></td>
             <% } %>
           <% }) %>
-            <td class="bold"><a href="<%= base %>/edit/<%= u.id %>"><i class="fa fa-edit"></i></a>
-              <a href="<%= base %>/remove/<%= u.id %>" class="delete-confirm"><i class="fa fa-remove"></i></a></td>
+            <td class="bold" style="white-space:nowrap">
+              <% instanceActions.forEach(function(action) { %>
+                <a class="<%= action.displayClass %>" href="<%= base %>/<%=u.id%>/<%= action.subURL %>"><i class="<%= action.iconClass %>"></i></a>
+              <% }) %>
+            </td>
         </tr>
       <% }) %>
         

@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-04-14
+* @Last Modified 2016-04-23
 */
 
 'use strict';
@@ -42,6 +42,8 @@ export default class AdminBase extends HasModels {
       this.templater.templateDir(this.templateDir())
 
     this.admin.modelAction(this.model(), 'Add', 'create', {iconClass:"fa fa-plus", suffixName: true})
+    this.admin.instanceAction(this.model(), 'Edit', 'edit', {iconClass:"fa fa-edit", suffixName: true})
+    this.admin.instanceAction(this.model(), 'Remove', 'remove', {iconClass:"fa fa-remove", suffixName: true, displayClass: "delete-confirm"})
 
     if(this.uploadType()) {
       this.app.get('data-loader').uploadPath(this.opts.basePath+this.base()+"/import", 'file')
@@ -53,8 +55,8 @@ export default class AdminBase extends HasModels {
     
     this.admin.adminPage(pluralize(this.displayName()), this.base(), {iconClass: this.iconClass()}, this._list.bind(this))
     this.admin.adminPage('New '+this.displayName(), this.base()+'/create', {nav: false}, this._create.bind(this))
-    this.admin.adminPage('Edit '+this.displayName(), this.base()+'/edit/:id', {nav: false}, this._edit.bind(this)) 
-    this.admin.adminRoute('get', this.base()+'/remove/:id', this._remove.bind(this))
+    this.admin.adminPage('Edit '+this.displayName(), this.base()+'/:id/edit', {nav: false}, this._edit.bind(this)) 
+    this.admin.adminRoute('get', this.base()+'/:id/remove', this._remove.bind(this))
     this.admin.adminRoute('post', this.base()+'/save', this._save.bind(this))
 
     this.templater.default().template(__dirname+"/../views/list.ejs", null, this.templatePrefix()+'-list')
@@ -170,8 +172,9 @@ export default class AdminBase extends HasModels {
     return Promise.all([
       find,
       this._getAttrs(this.models[this.model()], false),
-      this.admin.getModelActions(this.model())
-    ]).spread((insts, attributes, actions) => {
+      this.admin.getModelActions(this.model()),
+      this.admin.getInstanceActions(this.model()),
+    ]).spread((insts, attributes, actions, instanceActions) => {
       opts = _.extend({
         req,
         base: this.opts.basePath+this.base(),
@@ -180,7 +183,8 @@ export default class AdminBase extends HasModels {
         insts,
         attributes: attributes,
         upload: this.uploadType(),
-        actions
+        actions,
+        instanceActions
       }, opts)
       if(!opts[pluralize(this.model())]) opts[pluralize(this.model())] = insts
       else opts.insts = opts[pluralize(this.model())]
@@ -252,6 +256,7 @@ export default class AdminBase extends HasModels {
 
     attrs.forEach((attr) => {
       if(attr.type == 'boolean') values[attr.name] = (typeof values[attr.name] != 'undefined')
+      if(attr.type == 'json' || attr.type == 'mixed') values[attr.name] = JSON.parse(values[attr.name])
     })
 
     let promise = values.id

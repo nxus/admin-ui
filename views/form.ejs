@@ -2,7 +2,9 @@
 <div class="row">
   <div class="col-md-12">
   <% actions.forEach(function(action) { %>
+    <% if(req.path != base+"/"+inst.id+"/"+action.subURL) { %>
     <a class="btn btn-primary" href="<%= base %>/<%=inst.id%>/<%= action.subURL %>"><i class="<%= action.iconClass %>"></i> <%= action.label %><%if (action.suffixName) { %> <%=name%><%}%></a>
+    <% } %>
   <% }) %>
   <hr />
   </div>
