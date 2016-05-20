@@ -1,11 +1,11 @@
 {
-  "name": "@nxus/admin-ui",
-  "version": "2.4.0-10",
+  "name": "nxus-admin-ui",
+  "version": "3.0.0-0",
   "description": "An Admin UI Framework for Nxus Apps",
   "main": "lib",
   "scripts": {
-    "test": "NODE_ENV=test mocha --compilers js:babel/register -R spec",
-    "compile": "babel --optional runtime -d lib/ src/",
+    "test": "NODE_ENV=test mocha --compilers js:babel-core/register -R spec",
+    "compile": "babel src --out-dir lib",
     "prepublish": "npm run compile",
     "postpublish": "npm run docs-readme && npm run commit-update-docs",
     "docs-readme": "export NAME=`npm view . name`; export VERSION=`npm view . version`; documentation readme ./src/*.js --name $NAME --project-version $VERSION --readme-file ./README.md -s $NAME",
@@ -25,26 +25,33 @@
   "bugs": {
     "url": "https://github.com/nxus/admin-ui/issues"
   },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "homepage": "https://github.com/nxus/admin-ui#readme",
   "peerDependencies": {
-    "@nxus/core": "^2.4.0-0",
-    "@nxus/data-loader": "^2.4.0-3",
-    "@nxus/renderer": "^2.4.0-0",
-    "@nxus/templater": "^2.4.0-5",
-    "@nxus/router": "^2.4.0-0",
-    "@nxus/storage": "^2.4.0-0",
-    "@nxus/base-ui": "^2.4.0-0"
+    "nxus-core": "^3.0.0-0",
+    "nxus-data-loader": "^3.0.0-0",
+    "nxus-renderer": "^3.0.0-0",
+    "nxus-templater": "^3.0.0-0",
+    "nxus-router": "^3.0.0-0",
+    "nxus-storage": "^3.0.0-0",
+    "nxus-base-ui": "^3.0.0-0"
   },
   "devDependencies": {
-    "babel": "^5.6.23",
-    "chai": "^3.4.1",
-    "chai-as-promised": "^5.1.0",
-    "documentation": "^4.0.0-beta",
     "mocha": "^2.2.5",
-    "sinon": "^1.17.2"
+    "should": "^7.0.2",
+    "sinon": "^1.17.2",
+    "chai": "^3.5.0",
+    "documentation": "^4.0.0-beta",
+    "chai-as-promised": "^5.2.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-cli": "^6.9.0",
+    "babel-core": "^6.9.0"
   },
   "dependencies": {
-    "babel-runtime": "^5.7.0",
     "bluebird": "^3.2.1",
     "morph": "^0.2.0",
     "pluralize": "^1.2.1",

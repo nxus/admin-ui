@@ -2,7 +2,7 @@
 
 import AdminBase from '../src/adminBase'
 
-import TestApp from '@nxus/core/lib/test/support/TestApp';
+import TestApp from 'nxus-core/lib/test/support/TestApp';
 
 class AdminTest extends AdminBase {
   base () {

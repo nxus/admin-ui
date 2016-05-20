@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-04-23
+* @Last Modified 2016-05-20
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
@@ -10,7 +10,7 @@
  * 
  * ## Installation
  * 
- *     > npm install @nxus/admin-ui --save
+ *     > npm install nxus-admin-ui --save
  * 
  * ## Optional Module Configuration
  * There are two configuration options you can specify in your package.json file to change the way the admin-ui module

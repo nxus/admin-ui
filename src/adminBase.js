@@ -1,12 +1,12 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-04-23
+* @Last Modified 2016-05-20
 */
 
 'use strict';
 
-import {HasModels} from '@nxus/storage'
+import {HasModels} from 'nxus-storage'
 import pluralize from 'pluralize'
 import _ from 'underscore'
 import morph from 'morph'

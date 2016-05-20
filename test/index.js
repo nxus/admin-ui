@@ -2,7 +2,7 @@
 
 import AdminUI from '../src/index'
 
-import TestApp from '@nxus/core/lib/test/support/TestApp';
+import TestApp from 'nxus-core/lib/test/support/TestApp';
 
 describe("AdminUI", () => {
   var module;
