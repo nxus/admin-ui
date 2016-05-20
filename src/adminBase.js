@@ -267,7 +267,17 @@ export default class AdminBase extends HasModels {
       ? this.models[this.model()].update(values.id, values)
       : this.models[this.model()].create(values)
 
-    promise.then((u) => {req.flash('info', this.displayName()+' saved'); res.redirect(this.opts.basePath+this.base())})
+    promise.then((u) => {
+      req.flash('info', this.displayName()+' saved')
+      res.redirect(this.opts.basePath+this.base())
+    }).catch((e) => {
+      this.app.log.error(e)
+      req.flash('error', 'Error saving '+this.displayName()+': '+e)
+      if(values.id)
+        res.redirect(this.opts.basePath+this.base()+"/"+values.id+"/edit")
+      else
+        res.redirect(this.opts.basePath+this.base()+"/create")
+    })
   }
 
   _import (req, res) {

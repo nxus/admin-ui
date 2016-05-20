@@ -285,7 +285,7 @@ export default class AdminUI {
     if(path[0] != "/") path = "/"+path
     path = this.opts.basePath+path
     this.app.log('registering admin route', path)
-    this.pages[path] = {handler}
+    //this.pages[path] = {handler}
     this.router.route(method, path, handler)
   }
 
@@ -329,6 +329,7 @@ export default class AdminUI {
       if(fs.existsSync(model)) {
         this.app.log.debug('Loading admin model file at', model)
         model = require(model);
+        if(model.default) model = model.default
         adminModel = new model(this.app, opts)
       } else
         throw new Error('Class path '+model+' is not a valid file')
