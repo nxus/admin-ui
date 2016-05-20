@@ -1,4 +1,4 @@
-# @nxus/admin-ui
+# nxus-admin-ui
 
 ## 
 
@@ -8,7 +8,7 @@ An Admin UI Framework for Nxus Apps.
 
 ### Installation
 
-    > npm install @nxus/admin-ui --save
+    > npm install nxus-admin-ui --save
 
 ### Optional Module Configuration
 
