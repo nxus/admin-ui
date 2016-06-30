@@ -73,6 +73,30 @@ If you provide a callback, the return should either a string or a Promise for a 
       res.redirect('/admin')
     })
 
+### Actions
+
+The Admin UI provides a set of convenience functions for defining administrative actions for models and model instances.
+
+#### Instance Actions
+
+Use the `instanceAction` gatherer to define actions that relate to a specific instance. For example, `view` could defined as:
+
+   this.admin.instanceAction(this.model(), 'view', 'view', {iconClass:"fa fa-eye", suffixName: true})
+
+**Default Instance Actions**
+
+The Admin UI module provides the 'Edit' and 'Delete' instance action for you automatically.
+
+#### Model Actions
+
+Use model actions to do something that applys to the entire class, or no specific instance.
+
+   this.admin.modelAction(this.model(), 'Delete All', 'deleteall', {iconClass:"fa fa-remove", suffixName: true})
+
+**Default Model Actions**
+
+The Admin UI module provides the 'Create' model action for you automatically.
+
 ### Model View helpers
 
 The module provides a helper for generating list/detail views from a model:
