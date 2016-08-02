@@ -1,8 +1,26 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-04 18:40:18
-* @Last Modified 2016-05-20
+* @Last Modified 2016-07-28
 */
+
+'use strict';
+
+import Promise from 'bluebird'
+import fs from 'fs'
+import _ from 'underscore'
+import path from 'path'
+
+import AdminBaseClass from './adminBase'
+
+export var AdminBase = AdminBaseClass
+
+const defaultOpts = {
+  basePath: '/admin',
+  adminTemplate: 'admin',
+  limitToAdmin: true
+}
+
 /**
  * [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
  * 
@@ -146,39 +164,15 @@
  *   return app.get('renderer').render("ejs", "Email: <%= user.email %>", opts)
  * })
  * ```
- *  
+ * @example
+ *
+ * app.get('admin-ui')
  * 
  * # API
- * -----
+ * ----- 
+ * 
  */
-
-'use strict';
-
-import Promise from 'bluebird'
-import fs from 'fs'
-import _ from 'underscore'
-import path from 'path'
-
-import AdminBaseClass from './adminBase'
-
-export var AdminBase = AdminBaseClass
-
-const defaultOpts = {
-  basePath: '/admin',
-  adminTemplate: 'admin',
-  limitToAdmin: true
-}
-
-/**
- * The AdminUI module provides default templates and nav for an administrative section of your site.
- *  If the @nxus/users module is installed, the admin section will require admin-level authentication.
- * @example Configuration (defaults):
- *  {adminUI: {
- *    basePath: '/admin',    # urls registered for admin will start with this path
- *    adminTemplate: 'admin' # name of the main admin template to use
- *  }}
- */
-export default class AdminUI {
+class AdminUI {
   constructor(app) {
     this.app = app
     this.pages = {}
@@ -406,3 +400,5 @@ export default class AdminUI {
     })
   }
 }
+
+export default AdminUI

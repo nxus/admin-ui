@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-05-20
+* @Last Modified 2016-07-28
 */
 
 'use strict';
@@ -28,7 +28,7 @@ import Promise from 'bluebird'
  * }
  * 
  */
-export default class AdminBase extends HasModels {
+class AdminBase extends HasModels {
   constructor(app, opts={}) {
     super(app)
 
@@ -350,3 +350,5 @@ export default class AdminBase extends HasModels {
     return morph.toTitle(string)
   }
 }
+
+export default AdminBase
