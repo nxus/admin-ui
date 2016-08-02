@@ -1,6 +1,112 @@
 # nxus-admin-ui
 
-## 
+## AdminBase
+
+**Extends HasModels**
+
+The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
+
+**Examples**
+
+```javascript
+class TodoAdmin extends AdminBase {
+ base () {
+    return '/todo'
+  }
+ model () {
+    return 'todo'
+  }
+ templateDir () {
+    return __dirname+'/views'
+  }
+}
+```
+
+### base
+
+The base url for the Admin CRUD UI.
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to `/<models>`
+
+### display
+
+Fields in the model to show
+
+Returns **[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)** 
+
+### displayName
+
+The display name for the model to use in the Admin UI
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to `<model>`
+
+### iconClass
+
+The class to use for the nav icon.
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to `fa fa-file`
+
+### ignore
+
+Fields in the model to ignore in the UI
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### model
+
+Define the primary model for this admin module
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### modelNames
+
+Returns a hash of currently used models.
+
+Returns **\[type]** [description]
+
+### modelPopulate
+
+Define any populated relationships for the model
+
+Returns **[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)** 
+
+### templateDir
+
+The directory to find the templates.
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to null.
+
+### templatePrefix
+
+The prefix to use for the templates. Defaults to `admin-<model>-`
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### uploadOptions
+
+Options for data-loader on upload
+
+**Examples**
+
+```javascript
+return {identityFields: ['name'], mapping: {Name: 'name'}}
+```
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### uploadType
+
+Allow upload of models by this file type
+
+**Examples**
+
+```javascript
+return 'csv'
+```
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+## AdminUI
 
 [![Build Status](https://travis-ci.org/nxus/admin-ui.svg?branch=master)](https://travis-ci.org/nxus/admin-ui)
 
@@ -142,127 +248,13 @@ So using the examples above:
       return app.get('renderer').render("ejs", "Email: <%= user.email %>", opts)
     })
 
-## API
-
-* * *
-
-## AdminBase
-
-The AdminBase class provides a set of helper CRUD classes for defining Admin-UI based admin pages.
-
 **Examples**
 
 ```javascript
-class TodoAdmin extends AdminBase {
- base () {
-    return '/todo'
-  }
- model () {
-    return 'todo'
-  }
- templateDir () {
-    return __dirname+'/views'
-  }
-}
-```
+app.get('admin-ui')
 
-### base
-
-The base url for the Admin CRUD UI.
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to `/<models>`
-
-### display
-
-Fields in the model to show
-
-Returns **[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)** 
-
-### displayName
-
-The display name for the model to use in the Admin UI
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to `<model>`
-
-### iconClass
-
-The class to use for the nav icon.
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to `fa fa-file`
-
-### ignore
-
-Fields in the model to ignore in the UI
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
-
-### model
-
-Define the primary model for this admin module
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
-
-### modelNames
-
-Returns a hash of currently used models.
-
-Returns **\[type]** [description]
-
-### modelPopulate
-
-Define any populated relationships for the model
-
-Returns **[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)** 
-
-### templateDir
-
-The directory to find the templates.
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Defaults to null.
-
-### templatePrefix
-
-The prefix to use for the templates. Defaults to `admin-<model>-`
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
-
-### uploadOptions
-
-Options for data-loader on upload
-
-**Examples**
-
-```javascript
-return {identityFields: ['name'], mapping: {Name: 'name'}}
-```
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
-
-### uploadType
-
-Allow upload of models by this file type
-
-**Examples**
-
-```javascript
-return 'csv'
-```
-
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
-
-## AdminUI
-
-The AdminUI module provides default templates and nav for an administrative section of your site.
- If the @nxus/users module is installed, the admin section will require admin-level authentication.
-
-**Examples**
-
-```javascript
-Configuration (defaults):
- {adminUI: {
-   basePath: '/admin',    # urls registered for admin will start with this path
-   adminTemplate: 'admin' # name of the main admin template to use
- }}
+# API
+-----
 ```
 
 ### adminModel
