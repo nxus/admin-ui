@@ -1,6 +1,6 @@
 {
   "name": "nxus-admin-ui",
-  "version": "3.0.0-1",
+  "version": "3.0.0-2",
   "description": "An Admin UI Framework for Nxus Apps",
   "main": "lib",
   "scripts": {
