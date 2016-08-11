@@ -257,10 +257,12 @@ class AdminBase extends HasModels {
     attrs.forEach((attr) => {
       if(attr.type == 'boolean') values[attr.name] = (typeof values[attr.name] != 'undefined')
       try {
-        if(attr.type == 'json' || attr.type == 'mixed') values[attr.name] = JSON.parse(values[attr.name])
+        if(attr.type == 'json' || attr.type == 'mixed' || attr.type == 'array') values[attr.name] = JSON.parse(values[attr.name])
       } catch (e) {
+        this.app.log.error("adminBase: error processing json, array or mixed value of " + attr.name, e)
         delete values[attr.name]
       }
+
     })
 
     let promise = values.id
