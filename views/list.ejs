@@ -19,7 +19,7 @@
           <% attributes.forEach(function(attr) { %>
             <% if(attr.type == 'password') return %>
             <% if(attr.type == 'related') { %>
-              <td><%- u[attr.name] ? u[attr.name].name : "" %></td>
+              <td><% console.log(attr.name, u) %><%- u[attr.name] && u[attr.name].name ? u[attr.name].name : u[attr.name] %></td>
             <% } else if(attr.type == 'boolean') { %>
             <td><%- u[attr.name] ? '<i class="fa fa-check"></i>' : '' %></td>
             <% } else { %>

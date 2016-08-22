@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2016-02-05 15:38:26
-* @Last Modified 2016-07-28
+* @Last Modified 2016-08-22
 */
 
 'use strict';
@@ -167,7 +167,9 @@ class AdminBase extends HasModels {
   _list (req, res, opts = {}) {
     let find = this.models[this.model()].find().where({})
     if (this.modelPopulate() && this.modelPopulate().length > 0) {
-      find = find.populate(...this.modelPopulate())
+      for(var populate of this.modelPopulate()) {
+        find.populate(populate)
+      }
     }
     return Promise.all([
       find,
@@ -194,9 +196,6 @@ class AdminBase extends HasModels {
 
   _edit (req, res, opts = {}) {
     let find = this.models[this.model()].findOne().where(req.params.id)
-    if (this.modelPopulate() && this.modelPopulate().length > 0) {
-      find = find.populate(...this.modelPopulate())
-    }
     return Promise.all([
       find,
       this._getAttrs(this.models[this.model()]),
